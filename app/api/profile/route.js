@@ -3,16 +3,18 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import jwt from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import { cookies } from "next/headers";
+
 export async function GET(req) {
   try {
     // Get Authorization header and validate presence
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const cookieStore = await cookies(); // ✅ await cookies
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
       return NextResponse.json({ message: "Missing or invalid token" }, { status: 401 });
     }
 
-    // Extract token and verify JWT
-    const token = authHeader.split(" ")[1];
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -41,13 +43,12 @@ export async function GET(req) {
 
 export async function PUT(req) {
   try {
-    const authHeader = req.headers.get("authorization");
+    const cookieStore = await cookies(); // ✅ await cookies
+    const token = cookieStore.get("auth_token")?.value;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
       return NextResponse.json({ message: "Missing or invalid token" }, { status: 401 });
     }
-
-    const token = authHeader.split(" ")[1];
     let decoded;
 
     try {
