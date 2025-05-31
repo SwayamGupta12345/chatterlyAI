@@ -78,10 +78,14 @@ export default function ProfilePage() {
     })
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    router.push("/")
-  }
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+      router.push("/login"); // Or "/"
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
