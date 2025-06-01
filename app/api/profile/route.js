@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth"; // ✅ ADD THIS
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { ObjectId } from "mongodb";
 import { cookies } from "next/headers";
+import bcrypt from "bcryptjs"
 
 export async function GET(req) {
   try {
@@ -41,12 +42,18 @@ export async function PUT(req) {
     }
 
     const body = await req.json()
-    const { name, email, nickname } = body
+    const { name, email, pass, nickname } = body
 
+    if (!pass) {
+      return NextResponse.json({ message: "Password is required." }, { status: 400 })
+    }
+
+    const password = await bcrypt.hash(pass, 10);
+    
     const { db } = await connectToDatabase()
     const result = await db.collection("users").updateOne(
       { email: session.user.email },
-      { $set: { name, email, nickname } }
+      { $set: { name, email, password, nickname } }
     )
 
     if (result.modifiedCount === 0) {
