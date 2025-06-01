@@ -1,11 +1,21 @@
-import mongoose from "mongoose"
+import { ObjectId } from 'mongodb';
+import { connectToDatabase } from './mongodb.js';
 
-const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String },
-  name: { type: String },
-  bio: { type: String },
-  avatar: { type: String },
-}, { timestamps: true })
+export async function createUser({ name, email, nickname }) {
+  const { db } = await connectToDatabase();
+  const result = await db.collection('users').insertOne({
+    name,
+    email,
+    nickname: nickname || null,
+    chats: [],
+  });
+  return result.insertedId;
+}
 
-export default mongoose.models.User || mongoose.model("User", UserSchema)
+export async function addUserChat(userId, chatId) {
+  const { db } = await connectToDatabase();
+  await db.collection('users').updateOne(
+    { _id: new ObjectId(userId) },
+    { $push: { chats: new ObjectId(chatId) } }
+  );
+}
