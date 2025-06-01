@@ -8,6 +8,7 @@ export async function createUser({ name, email, nickname }) {
     email,
     nickname: nickname || null,
     chats: [],
+    friends:[],
   });
   return result.insertedId;
 }
