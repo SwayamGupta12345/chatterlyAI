@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Eye, EyeOff, BookOpen, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -11,13 +12,14 @@ export default function LoginPage() {
     password: "",
   })
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isEmailLoading, setIsEmailLoading] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsEmailLoading(true)
     setError("")
 
     try {
@@ -42,8 +44,12 @@ export default function LoginPage() {
     } catch (err) {
       setError("Network error. Please try again.")
     } finally {
-      setIsLoading(false)
+      setIsEmailLoading(false)
     }
+  }
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true)
+    signIn("google", { callbackUrl: "/dashboard" })
   }
 
   const handleChange = (e) => {
@@ -140,10 +146,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isEmailLoading}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              {isLoading ? (
+              {isEmailLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                   Signing In...
@@ -154,6 +160,31 @@ export default function LoginPage() {
             </button>
           </form>
 
+          <div className="my-6 text-center">
+            <p className="text-gray-500 mb-2">or sign in with</p>
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isGoogleLoading}
+              className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-xl font-medium hover:shadow transition-all duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGoogleLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (
+                <>
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png"
+                    alt="Google"
+                    className="w-5 h-5 mr-2"
+                  />
+                  Continue with Google
+                </>
+              )}
+            </button>
+
+          </div>
           {/* Sign Up Link */}
           <div className="text-center mt-8">
             <p className="text-gray-600">
