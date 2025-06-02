@@ -11,7 +11,7 @@ import remarkGfm from "remark-gfm"
 import { FaCopy, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import { getSession } from "next-auth/react"
 import { useSearchParams } from "next/navigation";
-
+import React from 'react';
 
 export default function AskDoubtClient() {
   const searchParams = useSearchParams();
@@ -95,7 +95,7 @@ export default function AskDoubtClient() {
     const fetchConversation = async () => {
       try {
         const res = await fetch(`/api/get-conversation?convoId=${convoId}`);
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) return;
         const data = await res.json();
 
         const formatted = data.messages.flatMap((pair) => [
@@ -348,10 +348,15 @@ export default function AskDoubtClient() {
                       </div>
                       <div className="markdown-content text-sm text-gray-800 overflow-x-auto">
                         <div className="min-w-full">
-                          <ReactMarkdown
+                          {/* <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                              p: ({ children }) => <p>{children}</p>,
+                              p: ({ children }) => {
+                                const isPre = React.Children.toArray(children).some(
+                                  (child) => typeof child === 'object' && child?.type === 'pre'
+                                );
+                                return isPre ? <>{children}</> : <p>{children}</p>;
+                              },
                               a: ({ href, children }) => (
                                 <a href={href} style={{ color: '#6cf', textDecoration: 'underline' }}>{children}</a>
                               ),
@@ -362,7 +367,7 @@ export default function AskDoubtClient() {
                                     {children}
                                   </code>
                                 ) : (
-                                  <div style={{ position: 'relative', marginBottom: '1rem' }} supresshydrationerror>
+                                  <div style={{ position: 'relative', marginBottom: '1rem' }}>
                                     <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm">
                                       <code>
                                         {typeof children === 'string'
@@ -421,6 +426,84 @@ export default function AskDoubtClient() {
                                 </td>
                               ),
                             }}
+                            suppressHydrationWarning
+                          >
+                            {msg.text}
+                          </ReactMarkdown> */}
+
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({ children }) => <p>{children}</p>,
+                              a: ({ href, children }) => (
+                                <a href={href} style={{ color: '#6cf', textDecoration: 'underline' }}>{children}</a>
+                              ),
+                              li: ({ children }) => <li>{children}</li>,
+                              code: ({ inline, children }) =>
+                                inline ? (
+                                  <code style={{ backgroundColor: '#333', padding: '2px 6px', borderRadius: '4px' }}>
+                                    {children}
+                                  </code>
+                                ) : (
+                                  <div style={{ position: 'relative', marginBottom: '1rem' }}>
+                                    <pre className="bg-gray-800 text-white p-4 rounded-md overflow-x-auto text-sm">
+                                      <code>
+                                        {typeof children === 'string'
+                                          ? children
+                                          : Array.isArray(children)
+                                            ? children.join('')
+                                            : ''}
+                                      </code>
+                                    </pre>
+                                    <div style={{ position: 'absolute', top: 6, right: 8, display: 'flex', gap: '8px' }}>
+                                      <button
+                                        onClick={() => handleCopy(Array.isArray(children) ? children.join('') : children)}
+                                        title="Copy"
+                                        className="action-button"
+                                        style={{ background: 'none', color:'white', border: 'none', cursor: 'pointer' }}
+                                      >
+                                        <FaCopy />
+                                      </button>
+                                      <button
+                                        onClick={() => sendToWhatsApp(children)}
+                                        title="Share via WhatsApp"
+                                        className="action-button"
+                                        style={{ background: 'none', color:'white', border: 'none', cursor: 'pointer' }}
+                                      >
+                                        <FaWhatsapp />
+                                      </button>
+                                      <button
+                                        onClick={() => sendToGmail(children)}
+                                        title="Send via Email"
+                                        className="action-button"
+                                        style={{ background: 'none', color:'white', border: 'none', cursor: 'pointer' }}
+                                      >
+                                        <FaEnvelope />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ),
+                              table: ({ children }) => (
+                                <div style={{ overflowX: 'auto' }}>
+                                  <table className="min-w-[500px] table-auto border border-gray-400 text-sm">
+                                    {children}
+                                  </table>
+                                </div>
+                              ),
+                              thead: ({ children }) => <thead style={{ backgroundColor: '#e5e7eb' }}>{children}</thead>,
+                              tbody: ({ children }) => <tbody>{children}</tbody>,
+                              tr: ({ children }) => <tr style={{ borderBottom: '1px solid #888' }}>{children}</tr>,
+                              th: ({ children }) => (
+                                <th className="border border-gray-400 bg-gray-200 px-4 py-2 text-left font-medium">
+                                  {children}
+                                </th>
+                              ),
+                              td: ({ children }) => (
+                                <td className="border border-gray-300 px-4 py-2 text-left">
+                                  {children}
+                                </td>
+                              ),
+                            }}
                             supresshydrationerror>
                             {msg.text}
                           </ReactMarkdown>
@@ -435,7 +518,7 @@ export default function AskDoubtClient() {
                               <FaCopy />
                               Copy
                             </button>
-                          </div>
+                          </div>  
                         )}
                       </div>
                     </div>
