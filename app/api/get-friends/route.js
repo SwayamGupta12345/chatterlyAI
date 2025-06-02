@@ -8,7 +8,10 @@ export async function GET(req) {
 
   if (!email) return NextResponse.json({ friends: [] });
 
-  const chatboxes = await db.collection("chatboxes").find({ participants: email }).toArray();
+  const chatboxes = await db.collection("chatboxes")
+    .find({ participants: email })
+    .sort({ lastModified: -1 }) // most recent first
+    .toArray();
 
   const friends = chatboxes.map(chat => {
     const friendEmail = chat.participants.find(p => p !== email);
