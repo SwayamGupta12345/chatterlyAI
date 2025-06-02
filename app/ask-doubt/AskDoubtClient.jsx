@@ -22,6 +22,7 @@ export default function AskDoubtClient() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [userEmail, setUserEmail] = useState("")
+  const [user_ai_chats, setUser_ai_chats] = useState([])
   // const searchParams = useSearchParams();
   // const convoId = searchParams.get("convoId");
   const messagesEndRef = useRef(null)
@@ -53,6 +54,24 @@ export default function AskDoubtClient() {
   }, [])
 
   useEffect(() => {
+    const fetchUserChats = async () => {
+      try {
+        const res = await fetch('/api/fetch-ai-chats');
+        const data = await res.json();
+        if (res.ok) {
+          setUser_ai_chats(data.chats); // or whatever state you use to render sidebar/chat list
+        } else {
+          console.error("Error loading chats:", data.message);
+        }
+      } catch (err) {
+        console.error("Fetch failed:", err);
+      }
+    };
+
+    fetchUserChats();
+  }, []);
+
+  useEffect(() => {
     const handleGlobalKeydown = (e) => {
       const isAllowed = /^[a-zA-Z0-9 ]$/.test(e.key)
       if (isAllowed && document.activeElement !== inputRef.current) {
@@ -73,19 +92,27 @@ export default function AskDoubtClient() {
   useEffect(() => {
     if (!convoId) return;
 
-    // Fetch conversation data using convoId
     const fetchConversation = async () => {
       try {
         const res = await fetch(`/api/get-conversation?convoId=${convoId}`);
+        if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
-        setMessages(data.messages || []);
+
+        const formatted = data.messages.flatMap((pair) => [
+          { text: pair.user, role: "user" },
+          { text: pair.ai, role: "ai" },
+        ]);
+
+        setMessages(formatted.length > 0 ? formatted : [{ text: "Start A Conversation", from: "system" }]);
       } catch (err) {
         console.error("Failed to load conversation", err);
+        setMessages([{ text: "Start A Conversation", from: "system" }]);
       }
     };
 
     fetchConversation();
   }, [convoId]);
+
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -141,7 +168,7 @@ export default function AskDoubtClient() {
           role: "ai",
         }),
       });
-      const { insertedId: aiMessageId } = await aiSave.json();
+      const { insertedId: aiResponseId } = await aiSave.json();
 
       // 4. Save message pair to conversation
       await fetch("/api/add-message-pair", {
@@ -152,7 +179,7 @@ export default function AskDoubtClient() {
         body: JSON.stringify({
           convoId,
           userMessageId,
-          aiMessageId,
+          aiResponseId,
         }),
       });
 
@@ -232,6 +259,22 @@ export default function AskDoubtClient() {
                 <MessageSquareDiff className="w-5 h-5" />
                 <span>New Chat</span>
               </button>
+              {/* Dynamically list previous AI chats */}
+              <div className="space-y-1 mt-4 px-2">
+                {user_ai_chats.length > 0 ? (
+                  user_ai_chats.map((chat) => (
+                    <Link
+                      key={chat._id}
+                      href={`/ask-doubt?convoId=${chat.convoId}`}
+                      className="block text-sm px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      {chat.name || "Untitled Chat"}
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-xs text-gray-400 px-4 italic">No previous chats</p>
+                )}
+              </div>
             </nav>
           </div>
           <div className="absolute bottom-6 left-6 right-6">
@@ -239,6 +282,7 @@ export default function AskDoubtClient() {
               <LogOut className="w-5 h-5" />
               <span>Logout</span>
             </button>
+
           </div>
         </div>
 
