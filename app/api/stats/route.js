@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getSession } from "@/lib/auth"
+import { getSession } from "next-auth/react"
 import { connectToDatabase } from "@/lib/mongodb"
 
 export async function GET() {
