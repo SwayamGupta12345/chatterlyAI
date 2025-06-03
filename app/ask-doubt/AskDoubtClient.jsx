@@ -1,7 +1,7 @@
 'use client';
 import { Inter } from 'next/font/google'
 import { useState, useEffect, useRef } from "react"
-import { BookOpen, Lightbulb, Menu, X, User, LogOut, ArrowLeft, Send, LayoutDashboard, MessageCircleMore, Bell, MessageSquareDiff } from "lucide-react"
+import { BookOpen, Lightbulb, Menu, X, User, LogOut, ArrowLeft, Send, LayoutDashboard, MessageCircleMore, Bell, MessageSquareDiff, Share, Lock } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useLayoutEffect, Suspense } from "react"
@@ -23,6 +23,12 @@ export default function AskDoubtClient() {
   const [error, setError] = useState("")
   const [userEmail, setUserEmail] = useState("")
   const [user_ai_chats, setUser_ai_chats] = useState([])
+  const [showShare, setShowShare] = useState(false);
+  //
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
   // const searchParams = useSearchParams();
   // const convoId = searchParams.get("convoId");
   const messagesEndRef = useRef(null)
@@ -71,24 +77,24 @@ export default function AskDoubtClient() {
     fetchUserChats();
   }, []);
 
-  useEffect(() => {
-    const handleGlobalKeydown = (e) => {
-      const isAllowed = /^[a-zA-Z0-9 ]$/.test(e.key)
-      if (isAllowed && document.activeElement !== inputRef.current) {
-        e.preventDefault()
-        inputRef.current?.focus()
+  // useEffect(() => {
+  //   const handleGlobalKeydown = (e) => {
+  //     const isAllowed = /^[a-zA-Z0-9 ]$/.test(e.key)
+  //     if (isAllowed && document.activeElement !== inputRef.current) {
+  //       e.preventDefault()
+  //       inputRef.current?.focus()
 
-        // Append the key to the input manually
-        setInput((prev) => prev + e.key)
-      }
-    }
+  //       // Append the key to the input manually
+  //       setInput((prev) => prev + e.key)
+  //     }
+  //   }
 
-    window.addEventListener("keydown", handleGlobalKeydown)
+  //   window.addEventListener("keydown", handleGlobalKeydown)
 
-    return () => {
-      window.removeEventListener("keydown", handleGlobalKeydown)
-    }
-  }, [])
+  //   return () => {
+  //     window.removeEventListener("keydown", handleGlobalKeydown)
+  //   }
+  // }, [])
   useEffect(() => {
     if (!convoId) return;
 
@@ -204,6 +210,38 @@ export default function AskDoubtClient() {
       router.push(`/ask-doubt?convoId=${data.convoId}`);
     } else {
       alert(data.message || "Failed to create chat");
+    }
+  };
+
+  const handleSendShare = async () => {
+    console.log("hit happened");
+
+    if (!selectedUser) return alert("Select a user is set.");
+
+    try {
+      const res = await fetch("/api/share-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target: selectedUser.email || selectedUser.nickname,
+          convoId,
+          message: shareMessage, // include message here
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Share failed");
+
+      alert("Chat shared successfully!");
+      setShowShare(false);
+      setSearchQuery("");
+      setSearchResults([]);
+      setSelectedUser("");
+      setShareMessage("");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Something went wrong");
     }
   };
 
@@ -324,6 +362,15 @@ export default function AskDoubtClient() {
 
               {/* Right section: Notification + Profile */}
               <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => setShowShare(true)}
+                  className="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <Share className="w-5 h-5 text-gray-600 mr-2" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+
+
                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
                   <Bell className="w-6 h-6 text-gray-600" />
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
@@ -336,6 +383,70 @@ export default function AskDoubtClient() {
               </div>
             </div>
           </header>
+          {showShare && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm relative">
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowShare(false)}
+                  className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded-md"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+
+                {/* Title */}
+                <h2 className="text-lg font-semibold mb-4">Share this page</h2>
+
+                {/* Add people */}
+                <label className="block text-sm font-medium mb-1">Add people and groups</label>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSelectedUser({ email: e.target.value }); // ← directly set selected user
+                  }}
+                  placeholder="Enter email or nickname"
+                  className="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4"
+                />
+
+
+                {/* Message */}
+                <textarea
+                  value={shareMessage}
+                  onChange={(e) => setShareMessage(e.target.value)}
+                  placeholder="Message"
+                  className="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4"
+                  rows={3}
+                />
+
+                {/* General Access */}
+                <div className="text-xs text-gray-600 mb-2">General access</div>
+                <div className="flex items-center gap-2 text-sm text-gray-700 mb-4">
+                  <Lock className="w-4 h-4 text-gray-500" />
+                  <span>Restricted — Only people with access can open with the link</span>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowShare(false)}
+                    className="text-sm text-gray-600 hover:underline"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSendShare}
+                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                  // disabled={!selectedUser}
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
 
           {/* Chat Body */}
           <div className="p-6">
