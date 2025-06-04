@@ -84,6 +84,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", { method: "POST" });
+      localStorage.removeItem("token")
       router.push("/login"); // Or "/"
     } catch (err) {
       console.error("Logout failed", err);
