@@ -477,6 +477,7 @@ export default function AskDoubtPage() {
       <AskDoubtClient />
     </Suspense>
   );
-}
+} 
+
 export const dynamic = "force-dynamic"; // Ensure this page is always dynamic
 export const revalidate = 0; // Disable static regeneration for this page
