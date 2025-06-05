@@ -29,6 +29,7 @@ import { FaCopy, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import { getSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import React from "react";
+import { io } from "socket.io-client";
 
 export default function AskDoubtClient() {
   const searchParams = useSearchParams();
@@ -47,6 +48,7 @@ export default function AskDoubtClient() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
   const [shareMessage, setShareMessage] = useState("");
+  const socket = useRef(null);
   // const searchParams = useSearchParams();
   // const convoId = searchParams.get("convoId");
   const messagesEndRef = useRef(null);
@@ -111,7 +113,7 @@ export default function AskDoubtClient() {
   //     }
   //   }
 
-  //   window.addEventListener("keydown", handleGlobalKeydown)
+  //   window.addEventListen]er("keydown", handleGlobalKeydown)
 
   //   return () => {
   //     window.removeEventListener("keydown", handleGlobalKeydown)
@@ -195,7 +197,7 @@ export default function AskDoubtClient() {
       const aiText = aiRes?.data?.response || "Unexpected response format.";
       const aiMessage = { role: "bot", text: aiText };
       setMessages((prev) => [...prev, aiMessage]);
-
+      console.log("ai res genet=rated")
       // 3. Save AI response via API
       const aiSave = await fetch("/api/Save-Message", {
         method: "POST",
@@ -208,6 +210,7 @@ export default function AskDoubtClient() {
           role: "ai",
         }),
       });
+      console.log("Response saved");
       const { insertedId: aiResponseId } = await aiSave.json();
 
       // 4. Save message pair to conversation
@@ -278,49 +281,148 @@ export default function AskDoubtClient() {
     }
   };
   const handleEditMessage = (id) => {
-  const msg = messages.find((m) => m.id === id); // or m._id depending on your data shape
-  if (!msg) return;
+    const msg = messages.find((m) => m.id === id); // or m._id depending on your data shape
+    if (!msg) return;
 
-  setEditingIndex(id); // Now storing the actual ID
-  setEditingText(msg.text);
-};
+    setEditingIndex(id); // Now storing the actual ID
+    setEditingText(msg.text);
+  };
 
 
+  // 1. Duplicated sendMessage logic, renamed to resendEditedMessage
+  const resendEditedMessage = async (text) => {
+    if (!text.trim()) return;
+
+    if (!userEmail) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "❗ Please login to use chat." },
+      ]);
+      return;
+    }
+
+    const userMessage = { role: "user", text };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
+    setError("");
+
+    try {
+      // Save user message
+      const userRes = await fetch("/api/Save-Message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderName: userEmail,
+          text,
+          role: "user",
+        }),
+      });
+      const { insertedId: userMessageId } = await userRes.json();
+
+      // Get AI response
+      const aiRes = await axios.post("https://askdemia1.onrender.com/chat", {
+        user_id: userEmail,
+        message: text,
+      });
+
+      const aiText = aiRes?.data?.response || "Unexpected response format.";
+      const aiMessage = { role: "bot", text: aiText };
+      setMessages((prev) => [...prev, aiMessage]);
+
+      // Save AI response
+      const aiSave = await fetch("/api/Save-Message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senderName: "AI",
+          text: aiText,
+          role: "ai",
+        }),
+      });
+
+      const { insertedId: aiResponseId } = await aiSave.json();
+
+      // Save message pair
+      await fetch("/api/add-message-pair", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          convoId,
+          userMessageId,
+          aiResponseId,
+        }),
+      });
+    } catch (err) {
+      console.error("Error resending message:", err);
+      setError("Something went wrong. Try again.");
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "⚠️ Server error. Please try again later." },
+      ]);
+    }
+
+    setLoading(false);
+  };
+
+  // 2. Updated confirmEditMessage
   const confirmEditMessage = async () => {
-  if (!editingText.trim()) return;
+    if (!editingText.trim()) return;
 
-  setMessages((prev) =>
-    prev.map((msg) =>
-      msg.id === editingIndex ? { ...msg, text: editingText } : msg
-    )
-  );
+    try {
+      const res = await fetch("/api/edit-ai-message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messageId: editingIndex,
+          convoId,
+        }),
+      });
 
-  await fetch('/api/edit-ai-message', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: editingIndex, // this is the actual message ID
-      text: editingText,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+      const result = await res.json();
 
-  setEditingIndex(null);
-  setEditingText("");
-};
+      if (result.success) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === editingIndex ? { ...msg, text: editingText } : msg
+          )
+        );
+        setEditingIndex(null);
+        // Send it as a new message flow
+        await resendEditedMessage(editingText);
+      } else {
+        alert("Edit failed: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error editing message:", err);
+      alert("Something went wrong.");
+    }
+
+    setEditingIndex(null);
+    setEditingText("");
+  };
 
   const handleDeleteMessage = async (id) => {
-  setMessages((prev) => prev.filter((msg) => msg.id !== id));
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
 
-  await fetch(`/api/delete-ai-message`, {
-    method: 'POST',
-    body: JSON.stringify({ id }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-};
+    await fetch('/api/delete-ai-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messageId: id,
+        convoId: convoId,
+      }),
+    });
+    console.log("deleted completely");
+  };
 
   const handleLogout = async () => {
     try {
