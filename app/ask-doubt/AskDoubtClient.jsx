@@ -618,13 +618,15 @@ export default function AskDoubtClient() {
 
               {/* Right section: Notification + Profile */}
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setShowShare(true)}
-                  className="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                >
-                  <Share className="w-5 h-5 text-gray-600 mr-2" />
-                  <span className="hidden sm:inline">Share</span>
-                </button>
+                {convoId != "Temporary Chat" && (
+                  <button
+                    onClick={() => setShowShare(true)}
+                    className="flex items-center border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    <Share className="w-5 h-5 text-gray-600 mr-2" />
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+                )}
 
                 <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
                   <Bell className="w-6 h-6 text-gray-600" />
@@ -654,7 +656,7 @@ export default function AskDoubtClient() {
 
                 {/* Add people */}
                 <label className="block text-sm font-medium mb-1">
-                  Add people and groups
+                  Add People
                 </label>
                 <input
                   type="text"
@@ -666,7 +668,9 @@ export default function AskDoubtClient() {
                   placeholder="Enter email or nickname"
                   className="w-full border border-gray-300 rounded-lg p-2 text-sm mb-4"
                 />
-
+                <label className="block text-sm font-medium mb-1">
+                  Enter Message to Share
+                </label>
                 {/* Message */}
                 <textarea
                   value={shareMessage}
@@ -677,7 +681,8 @@ export default function AskDoubtClient() {
                 />
 
                 {/* General Access */}
-                <div className="text-xs text-gray-600 mb-2">General access</div>
+                {/* <div className="text-xs text-gray-600 mb-2">General access</div> */}
+                <div className="text-xs text-gray-600 mb-2">Access Rules</div>
                 <div className="flex items-center gap-2 text-sm text-gray-700 mb-4">
                   <Lock className="w-4 h-4 text-gray-500" />
                   <span>
@@ -689,7 +694,7 @@ export default function AskDoubtClient() {
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={() => setShowShare(false)}
-                    className="text-sm text-gray-600 hover:underline"
+                    className="text-sm bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
                   >
                     Cancel
                   </button>
@@ -945,7 +950,7 @@ export default function AskDoubtClient() {
               </div>
 
               {/* Chat Input Fixed at Bottom */}
-              <div className="fixed bottom-0 left-0 right-0 lg:ml-64 bg-white/90 backdrop-blur-lg border-t border-white/20 px-6 py-4 z-50">
+              <div className="fixed bottom-0 left-0 right-0 lg:ml-64 bg-white/90 backdrop-blur-lg border-t border-white/20 px-6 py-4 z-40">
                 <div className="flex items-center gap-2 max-w-7xl mx-auto">
                   <textarea
                     ref={inputRef}
