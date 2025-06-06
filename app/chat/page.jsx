@@ -312,7 +312,7 @@ export default function AskDoubtPage() {
     if (!input.trim() || !chatboxId || !userEmail) return;
     const message = {
       senderEmail: userEmail,
-      chatboxId,
+      roomId: chatboxId,
       text: input,
     };
 
@@ -351,7 +351,7 @@ export default function AskDoubtPage() {
       socket.current?.emit("edit-message", {
         messageId: updatedMsg._id,
         newText: editingText,
-        chatboxId, // required for server to emit to room
+        roomId: chatboxId, // required for server to emit to room
       });
     } else {
       alert("Failed to edit message.");
@@ -377,7 +377,7 @@ export default function AskDoubtPage() {
       // ✅ Emit socket event to update other user
       socket.current?.emit("delete-message", {
         messageId: msg._id,
-        chatboxId,
+        roomId: chatboxId,
       });
     } else {
       alert("Failed to delete message.");
