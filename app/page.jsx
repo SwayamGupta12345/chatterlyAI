@@ -10,7 +10,7 @@ export default function LandingPage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
   const features = [
-    {
+    { 
       icon: Lightbulb,
       title: "Better Responses",
       description: "Uses AI Agents for refining and giving better results",
@@ -330,7 +330,7 @@ export default function LandingPage() {
 
                 <div className="flex items-center space-x-4 mb-4">
                   <img
-                    src="./swayam.jpg"
+                    src="./Swayam.jpg"
                     alt="Swayam Gupta"
                     className="w-12 h-12 rounded-full border-2 border-purple-500"
                   />
@@ -368,7 +368,7 @@ export default function LandingPage() {
 
                 <div className="flex items-center space-x-4 mb-4">
                   <img
-                    src="./rishu.jpg"
+                    src="./Rishu.jpg"
                     alt="Rishu"
                     className="w-12 h-12 rounded-full border-2 border-purple-500"
                   />
