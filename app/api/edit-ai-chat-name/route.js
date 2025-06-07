@@ -8,7 +8,7 @@ export async function POST(req) {
     const { chatId, newName } = await req.json();
     if (!chatId || !newName) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-    }
+    } 
 
     const { db } = await connectToDatabase();
     await db.collection("chats").updateOne(
