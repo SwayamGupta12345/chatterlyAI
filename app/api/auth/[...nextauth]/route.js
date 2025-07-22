@@ -117,18 +117,15 @@ export const authOptions = {
       session.accessToken = token.accessToken;
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      return "/dashboard"; // always redirect to dashboard
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/signup",
+    signIn: "/login",
   },
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
-// This code sets up NextAuth with Google authentication, connecting to a MongoDB database to manage user sessions and data.
-// It handles user sign-in, JWT token creation, and session management, ensuring that user data is stored and retrieved correctly from the database.
-// The code also includes error handling for database operations and ensures that user IDs are correctly attached to the session and JWT tokens.
-// The `connectToDatabase` function is assumed to be defined in the `lib/mongodb` module, which establishes a connection to the MongoDB database.
-// The `authOptions` object contains the configuration for NextAuth, including the authentication provider, callbacks for sign-in, JWT, and session management, and the secret key for signing tokens.
-// The `handler` is exported for handling GET and POST requests to the NextAuth API route.
+export { handler as GET, handler as POST }; 
