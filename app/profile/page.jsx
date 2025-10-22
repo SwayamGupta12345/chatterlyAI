@@ -155,13 +155,13 @@ export default function ProfilePage() {
               >
                 {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
-              <Link
+              {/* <Link
                 href="/dashboard"
                 className="flex items-center text-purple-600 hover:text-purple-700 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 Back to Dashboard
-              </Link>
+              </Link> */}
             </div>
             {/* Right section: Notification + Profile */}
             <div className="flex items-center space-x-4">
