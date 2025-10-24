@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 export async function middleware(request) {
   const jwtToken = request.cookies.get("auth_token")?.value;
   // const nextAuthToken = request.cookies.get("next-auth.session-token")?.value;
-  const nextAuthToken = request.cookies.get("next-auth.session-token")?.value || request.cookies.get("__SecureNextAuth.session-token")?.value;
+  const nextAuthToken = request.cookies.get("next-auth.session-token")?.value || request.cookies/get("__SecureNextAuth.session-token")?.value;
 
   if(!process.env.JWT_SECRET) {
     console.error("JWT_SECRET is not defined in environment variables.");
