@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
-    email: "", 
+    email: "",
     password: "",
     confirmPassword: "",
   })
@@ -16,7 +16,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
-
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -53,6 +53,15 @@ export default function SignupPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true)
+    signIn("google", { callbackUrl: "/dashboard" })
+    // const callbackUrl = process.env.NODE_ENV === "production"
+    //   ? `${window.location.origin}/dashboard`
+    //   : "http://localhost:3000/dashboard";
+    signIn("google", { callbackUrl, redirect: true });
   }
 
   const handleChange = (e) => {
@@ -199,11 +208,19 @@ export default function SignupPage() {
           <div className="my-6 text-center">
             <p className="text-gray-500 mb-2">or sign up with</p>
             <button
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              onClick={handleGoogleLogin}
+              disabled={isGoogleLoading}
               className="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-xl font-medium hover:shadow transition-all duration-300 flex items-center justify-center"
             >
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png" alt="Google" className="w-5 h-5 mr-2" />
-              Continue with Google
+              {isGoogleLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Signing In...
+                </div>
+              ) : (<>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/2048px-Google_%22G%22_logo.svg.png" alt="Google" className="w-5 h-5 mr-2" />
+                Continue with Google
+              </>)}
             </button>
           </div>
           {/* Login Link */}
