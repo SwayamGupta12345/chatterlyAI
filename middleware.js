@@ -30,7 +30,7 @@ export async function middleware(request) {
   // 2️⃣ If you're logged in with NextAuth (Google etc.)
   if (nextAuthToken) {
     // Token exists, trust NextAuth
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.next();
   }
 
   // 3️⃣ Otherwise not authenticated
