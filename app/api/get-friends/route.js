@@ -47,6 +47,7 @@ export async function GET(req) {
       email: friendEmail,
       nickname: fromArr?.nickname || null, // ✅ Friend name stored in DB
       lastModified: fromArr?.lastModified || chat.lastModified,
+      pinned: chat.pinned || false, // ✅ Added field
     };
   });
   return NextResponse.json({ friends });
