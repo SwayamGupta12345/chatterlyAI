@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { ObjectId } from "mongodb";
-
+ 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
