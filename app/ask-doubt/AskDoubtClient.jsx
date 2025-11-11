@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   Lightbulb,
-  Menu,
+  Menu,    
   X,
   User,
   LogOut,
