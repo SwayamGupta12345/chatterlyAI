@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 import FallbackLayout from "./FallbackLayout";
 import { Inter } from "next/font/google";
 import { useState, useEffect, useRef } from "react";
