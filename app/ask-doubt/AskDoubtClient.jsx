@@ -126,8 +126,11 @@ export default function AskDoubtClient() {
     // ✅ new message listener
     socket.current.on("receive-message", ({ chatboxId, senderEmail, text }) => {
       // Push message to UI instantly
-      if(!text.trim()) return;
-      setMessages((prev) => [...prev, { role: senderEmail === "AI" ? "bot" : "user", text }]);
+      if (!text.trim()) return;
+      setMessages((prev) => [
+        ...prev,
+        { role: senderEmail === "AI" ? "bot" : "user", text },
+      ]);
     });
 
     return () => {
@@ -621,13 +624,10 @@ export default function AskDoubtClient() {
       const idx = prev.findIndex((msg) => msg.id === id);
       if (idx === -1) return prev;
 
-      // remove both: the user message and its next AI response (if any)
-      const updated = [...prev];
-      updated.splice(idx, 1); // remove user message
-      if (updated[idx] && updated[idx].role === "bot") {
-        updated.splice(idx, 1); // remove immediate AI response
-      }
-      return updated;
+      const idsToRemove = [id];
+      if (idx + 1 < prev.length) idsToRemove.push(prev[idx + 1].id);
+
+      return prev.filter((msg) => !idsToRemove.includes(msg.id));
     });
 
     try {
@@ -902,8 +902,9 @@ export default function AskDoubtClient() {
         {/* Sidebar */}
         <div
           ref={sidebarRef}
-          className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } lg:translate-x-0`}
+          className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-8">
@@ -980,8 +981,8 @@ export default function AskDoubtClient() {
                               if (e.key === "Escape") setEditingChatId(null);
                             }}
                             className="text-sm bg-transparent border border-transparent border-b border-gray-300 w-[90%] mr-2
-                 focus:border-indigo-500 focus:ring-0 outline-none px-1 py-[2px] rounded-sm 
-                 transition-all duration-200"
+                     focus:border-indigo-500 focus:ring-0 outline-none px-1 py-[2px] rounded-sm 
+                       transition-all duration-200"
                             placeholder="Enter new name..."
                           />
                         </div>
@@ -989,10 +990,11 @@ export default function AskDoubtClient() {
                         <Link
                           href={`/ask-doubt?convoId=${chat.convoId}`}
                           onClick={() => setSelectedConvoId(chat.convoId)}
-                          className={`block text-sm px-4 py-2 rounded-lg transition-colors pr-[25%] truncate w-full relative ${selectedConvoId === chat.convoId
-                            ? "bg-purple-200 text-purple-800"
-                            : "hover:bg-gray-100 text-gray-700"
-                            }`}
+                          className={`block text-sm px-4 py-2 rounded-lg transition-colors pr-[25%] truncate w-full relative ${
+                            selectedConvoId === chat.convoId
+                              ? "bg-purple-200 text-purple-800"
+                              : "hover:bg-gray-100 text-gray-700"
+                          }`}
                           title={chat.name || "New Chat"} // optional: show full name on hover
                         >
                           {chat.name || "New Chat"}
@@ -1250,14 +1252,16 @@ export default function AskDoubtClient() {
                 {messages.map((msg, index) => (
                   <div
                     key={msg.id || index}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
+                    className={`flex ${
+                      msg.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                   >
                     <div
-                      className={`px-4 py-3 rounded-xl shadow-md break-words ${msg.role === "user"
-                        ? "bg-purple-100 text-right rounded-br-none self-end  max-w-[70%] sm:max-w-md"
-                        : "bg-blue-100 text-left rounded-bl-none self-start max-w-[90%] sm:max-w-2xl overflow-x-auto"
-                        }`}
+                      className={`px-4 py-3 rounded-xl shadow-md break-words ${
+                        msg.role === "user"
+                          ? "bg-purple-100 text-right rounded-br-none self-end  max-w-[70%] sm:max-w-md"
+                          : "bg-blue-100 text-left rounded-bl-none self-start max-w-[90%] sm:max-w-2xl overflow-x-auto"
+                      }`}
                     >
                       <div className="text-xs font-semibold mb-1">
                         {msg.role === "user" ? "You" : "Bot"}
@@ -1331,8 +1335,8 @@ export default function AskDoubtClient() {
                                           {typeof children === "string"
                                             ? children
                                             : Array.isArray(children)
-                                              ? children.join("")
-                                              : ""}
+                                            ? children.join("")
+                                            : ""}
                                         </code>
                                       </pre>
                                       <div
@@ -1435,10 +1439,11 @@ export default function AskDoubtClient() {
                         </div>
                         {msg.text && (
                           <div
-                            className={`flex gap-4 items-center mt-2 text-xs text-gray-700 ${msg.role === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                              }`}
+                            className={`flex gap-4 items-center mt-2 text-xs text-gray-700 ${
+                              msg.role === "user"
+                                ? "justify-end"
+                                : "justify-start"
+                            }`}
                           >
                             {msg.role === "user" && (
                               <>
@@ -1477,8 +1482,8 @@ export default function AskDoubtClient() {
                                   isPaused
                                     ? "Resume speaking"
                                     : isSpeaking
-                                      ? "Pause speaking"
-                                      : "Play"
+                                    ? "Pause speaking"
+                                    : "Play"
                                 }
                                 className="flex items-center gap-1 text-green-600 hover:text-green-800 transition"
                               >
@@ -1495,8 +1500,8 @@ export default function AskDoubtClient() {
                                   {isPaused
                                     ? "Resume"
                                     : isSpeaking
-                                      ? "Pause"
-                                      : "Play"}
+                                    ? "Pause"
+                                    : "Play"}
                                 </span>
                                 {isSpeaking && (
                                   <button
@@ -1547,10 +1552,11 @@ export default function AskDoubtClient() {
                   />
                   <button
                     onClick={toggleListening}
-                    className={`p-2 rounded-xl border transition ${listening
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-black"
-                      }`}
+                    className={`p-2 rounded-xl border transition ${
+                      listening
+                        ? "bg-red-500 text-white"
+                        : "bg-white text-black"
+                    }`}
                   >
                     {listening ? (
                       <MicOff className="w-5 h-5" />
