@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export async function GET(req) {
-  try {
+  try { 
     const { searchParams } = new URL(req.url);
     const convoId = searchParams.get("convoId");
 
