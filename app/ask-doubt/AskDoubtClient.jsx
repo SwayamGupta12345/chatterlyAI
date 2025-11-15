@@ -129,7 +129,7 @@ export default function AskDoubtClient() {
       if (!text.trim()) return;
       setMessages((prev) => [
         ...prev,
-        { role: senderEmail === "AI" ? "bot" : "user", text },
+        { role: senderEmail === "AI" ? "bot" : "user", text, isImg: false },
       ]);
     });
 
@@ -165,6 +165,7 @@ export default function AskDoubtClient() {
           {
             role: "bot",
             text: "⚠️ Please log in again. User session is missing.",
+            isImg: false,
           },
         ]);
       }
@@ -212,7 +213,6 @@ export default function AskDoubtClient() {
   useEffect(() => {
     fetchUserChats();
   }, []);
-
   useEffect(() => {
     if (!convoId) return;
 
@@ -227,22 +227,27 @@ export default function AskDoubtClient() {
             id: pair.user?.id || null,
             text: pair.user?.text || "[Missing User Message]",
             role: "user",
+            isImg: pair.user?.isImg ?? false, // <-- FIXED
           },
           {
             id: pair.ai?.id || null,
             text: pair.ai?.text || "[Missing AI Response]",
             role: "ai",
+            isImg: pair.ai?.isImg ?? false, // <-- FIXED
           },
         ]);
 
         setMessages(
           formatted.length > 0
             ? formatted
-            : [{ text: "Start A Conversation", from: "system" }]
+            : [{ text: "Start A Conversation", role: "system", isImg: false }]
         );
       } catch (err) {
         console.error("Failed to load conversation", err);
-        setMessages([{ text: "Start A Conversation", from: "system" }]);
+
+        setMessages([
+          { text: "Start A Conversation", role: "system", isImg: false },
+        ]);
       }
     };
 
@@ -335,7 +340,7 @@ export default function AskDoubtClient() {
     if (!userEmail) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "❗ Please login" },
+        { role: "bot", text: "❗ Please login,", isImg: false },
       ]);
       return;
     }
@@ -347,6 +352,7 @@ export default function AskDoubtClient() {
       roomId: convoId,
       senderEmail: userEmail,
       text: input,
+      isImg: false,
     });
     setInput("");
     setLoading(true);
@@ -361,6 +367,7 @@ export default function AskDoubtClient() {
           senderName: userEmail,
           text: input,
           role: "user",
+          isImg: false,
         }),
       });
 
@@ -381,6 +388,7 @@ export default function AskDoubtClient() {
         roomId: convoId,
         senderEmail: "AI",
         text: aiText,
+        isImg: false,
       });
       setLoading(false);
       // 5️⃣ Save AI response in DB
@@ -412,7 +420,11 @@ export default function AskDoubtClient() {
       setError("Something went wrong. Try again.");
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "⚠️ Server error. Please try again later." },
+        {
+          role: "bot",
+          text: "⚠️ Server error. Please try again later.",
+          isImg: false,
+        },
       ]);
     } finally {
       setLoading(false);
@@ -513,23 +525,24 @@ export default function AskDoubtClient() {
     if (!userEmail) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "❗ Please login to use chat." },
+        { role: "bot", text: "❗ Please login to use chat.", isImg: false },
       ]);
       return;
     }
 
-    // 1️⃣ Optimistically remove all messages below the edited one
+    // 1️⃣ Remove all messages below the edited one
     setMessages((prev) => prev.slice(0, editIndex + 1));
 
-    // 2️⃣ Add updated user message immediately
-    const updatedUserMsg = { role: "user", text };
+    // 2️⃣ Insert updated user message immediately
+    const updatedUserMsg = { role: "user", text, isImg: false };
     setMessages((prev) => [...prev.slice(0, editIndex), updatedUserMsg]);
+
     setInput("");
     setLoading(true);
     setError("");
 
     try {
-      // 🔹 Delete old messages from backend (those below current index)
+      // 🔹 Delete old messages from DB
       await fetch("/api/delete-below", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -552,16 +565,16 @@ export default function AskDoubtClient() {
 
       const { insertedId: userMessageId } = await userRes.json();
 
-      // 🔹 Fetch new AI response
+      // 🔹 Fetch fresh AI response
       const aiRes = await axios.post("https://askdemia1.onrender.com/chat", {
         user_id: userEmail,
         message: text,
       });
 
       const aiText = aiRes?.data?.response || "Unexpected response format.";
-      const aiMessage = { role: "bot", text: aiText };
+      const aiMessage = { role: "bot", text: aiText, isImg: false };
 
-      // 3️⃣ Add AI message to UI immediately
+      // 3️⃣ Add AI message
       setMessages((prev) => [...prev, aiMessage]);
       setLoading(false);
 
@@ -592,10 +605,14 @@ export default function AskDoubtClient() {
       console.error("Error resending message:", err);
       setError("Something went wrong. Try again.");
 
-      // 4️⃣ Show error response in UI
+      // 4️⃣ Add error message
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "⚠️ Server error. Please try again later." },
+        {
+          role: "bot",
+          text: "⚠️ Server error. Please try again later.",
+          isImg: false,
+        },
       ]);
     }
 
@@ -621,14 +638,20 @@ export default function AskDoubtClient() {
       const result = await res.json();
 
       if (result.success) {
+        // Update local UI text + preserve isImg: false
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === editingIndex ? { ...msg, text: editingText } : msg
+            msg.id === editingIndex
+              ? { ...msg, text: editingText, isImg: false }
+              : msg
           )
         );
+
+        const oldIndex = editingIndex;
         setEditingIndex(null);
-        // Send it as a new message flow
-        await resendEditedMessage(editingText);
+
+        // Send updated message as new flow
+        await resendEditedMessage(editingText, oldIndex);
       } else {
         alert("Edit failed: " + result.message);
       }
@@ -640,14 +663,22 @@ export default function AskDoubtClient() {
     setEditingIndex(null);
     setEditingText("");
   };
+
   // handling the deletion of a message
   const handleDeleteMessage = async (id) => {
     setMessages((prev) => {
       const idx = prev.findIndex((msg) => msg.id === id);
       if (idx === -1) return prev;
 
-      const idsToRemove = [id];
-      if (idx + 1 < prev.length) idsToRemove.push(prev[idx + 1].id);
+      const idsToRemove = [];
+
+      // Remove this message
+      if (prev[idx]?.id) idsToRemove.push(prev[idx].id);
+
+      // Remove paired message (next one) only if it has a real ID
+      if (idx + 1 < prev.length && prev[idx + 1]?.id) {
+        idsToRemove.push(prev[idx + 1].id);
+      }
 
       return prev.filter((msg) => !idsToRemove.includes(msg.id));
     });
@@ -661,6 +692,7 @@ export default function AskDoubtClient() {
           convoId,
         }),
       });
+
       console.log("Deleted completely");
     } catch (err) {
       console.error("Delete failed:", err);
