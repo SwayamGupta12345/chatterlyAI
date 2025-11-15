@@ -14,7 +14,7 @@ export async function POST(req) {
       { convoId: new ObjectId(convoId) }, // 🔥 wrap with ObjectId
       { $set: { lastModified: new Date() } }
     );
-
+ 
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Error updating lastModified:", err);

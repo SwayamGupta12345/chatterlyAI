@@ -9,7 +9,7 @@ import {
   Menu,
   X,
   User, 
-  LogOut,
+  LogOut, 
   ArrowLeft,
   Send,
   LayoutDashboard,
