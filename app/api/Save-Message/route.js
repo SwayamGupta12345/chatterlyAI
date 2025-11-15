@@ -6,7 +6,7 @@
 // import { ObjectId } from 'mongodb';
 
 // export async function POST(req) {
-//   try {
+//   try { 
 //     const { senderName, text, role } = await req.json();
 
 //     if (!senderName || !text || !role) {
