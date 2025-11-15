@@ -38,13 +38,13 @@ export async function GET(req) {
             id: userMsg?._id?.toString() || null,
             text: userMsg?.text || "[Missing User Message]",
             isImg: userMsg?.isImg ?? false,
-            image: userMsg?.image ?? null,
+            imageUrl: userMsg?.imageUrl ?? null,
           },
           ai: {
             id: aiMsg?._id?.toString() || null,
             text: aiMsg?.text || "[Missing AI Response]",
             isImg: aiMsg?.isImg ?? false,
-            image: aiMsg?.image ?? null,
+            imageUrl: aiMsg?.imageUrl ?? null,
           },
         };
       })

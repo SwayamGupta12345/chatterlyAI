@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   Lightbulb,
-  Menu, 
+  Menu,
   X,
   User,
   LogOut,
@@ -329,45 +329,45 @@ export default function AskDoubtClient() {
       setLoading(false);
     }
   };
-
-
   useEffect(() => {
     if (!convoId) return;
 
     const fetchConversation = async () => {
       try {
         const res = await fetch(`/api/get-conversation?convoId=${convoId}`);
-        if (!res.ok) return;
-        const data = await res.json();
 
+        if (!res.ok) throw new Error("Failed to fetch");
+
+        const data = await res.json();
+        console.log(data);
+        // Flatten messages for UI, always use imageUrl
         const formatted = data.messages.flatMap((pair) => [
           {
             id: pair.user?.id || null,
             text: pair.user?.text || "[Missing User Message]",
             role: "user",
             isImg: pair.user?.isImg ?? false,
-            image: pair.user?.image ?? null,
+            imageUrl: pair.user?.imageUrl ?? null, // 🔥 fixed
           },
           {
             id: pair.ai?.id || null,
             text: pair.ai?.text || "[Missing AI Response]",
             role: "ai",
             isImg: pair.ai?.isImg ?? false,
-            image: pair.ai?.image ?? null,
+            imageUrl: pair.ai?.imageUrl ?? null, // 🔥 fixed
           },
         ]);
 
         setMessages(
           formatted.length > 0
             ? formatted
-            : [{ text: "Start A Conversation", from: "system" }]
+            : [{ text: "Start A Conversation", role: "system", isImg: false }]
         );
       } catch (err) {
         console.error("Failed to load conversation", err);
         setMessages([
           { text: "Start A Conversation", role: "system", isImg: false },
         ]);
-        setMessages([{ text: "Start A Conversation", from: "system" }]);
       }
     };
 
@@ -1450,10 +1450,10 @@ export default function AskDoubtClient() {
                               }`}
                             >
                               <img
-                                src={msg.image}
+                                src={msg.imageUrl}
                                 alt="Generated"
                                 className="w-full h-auto rounded-lg object-cover cursor-pointer"
-                                onClick={() => setFullscreenImage(msg.image)}
+                                onClick={() => setFullscreenImage(msg.imageUrl)}
                               />{" "}
                               <div className="flex items-center justify-between px-1">
                                 <button
@@ -1465,12 +1465,32 @@ export default function AskDoubtClient() {
                                   Copy
                                 </button>
 
-                                <button
+                                {/* <button
                                   onClick={() => {
                                     const a = document.createElement("a");
-                                    a.href = msg.image;
+                                    a.href = msg.imageUrl;
                                     a.download = "generated.png";
                                     a.click();
+                                  }}
+                                  className="text-blue-500 text-xs font-semibold"
+                                >
+                                  Download
+                                </button> */}
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      const res = await fetch(msg.imageUrl);
+                                      const blob = await res.blob();
+                                      const url =
+                                        window.URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      a.download = "generated.png"; // filename
+                                      a.click();
+                                      window.URL.revokeObjectURL(url);
+                                    } catch (err) {
+                                      console.error("Download failed", err);
+                                    }
                                   }}
                                   className="text-blue-500 text-xs font-semibold"
                                 >

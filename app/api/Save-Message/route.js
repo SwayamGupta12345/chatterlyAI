@@ -33,24 +33,38 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
+import cloudinary from "@/lib/cloudinary";
 
 export async function POST(req) {
   try {
-    const { senderName, text, role, isImg = false, image = null } =
-      await req.json();
+    const {
+      senderName,
+      text,
+      role,
+      isImg = false,
+      image = null,
+    } = await req.json();
 
     if (!senderName || !text || !role) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
     const { db } = await connectToDatabase();
+    let imageUrl = null;
+    // ⬇️ Upload only if it's an image
+    if (isImg && image) {
+      const uploadRes = await cloudinary.uploader.upload(image, {
+        folder: "chat_images",
+      });
+      imageUrl = uploadRes.secure_url;
+    }
 
     const result = await db.collection("messages").insertOne({
       senderName,
       text,
       role,
-      isImg,        // 🔥 store image flag
-      image,        // 🔥 store base64 image
+      isImg, // 🔥 store image flag
+      imageUrl, // 🔥 store base64 image
       timestamp: new Date(),
     });
 
