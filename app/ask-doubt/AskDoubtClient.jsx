@@ -129,23 +129,8 @@ export default function AskDoubtClient() {
       if (!text.trim()) return;
       setMessages((prev) => [
         ...prev,
-        { role: senderEmail === "AI" ? "bot" : "user", text, isImg: false },
+        { role: senderEmail === "AI" ? "bot" : "user", text },
       ]);
-    });
-
-    socket.current.on("message-deleted", ({ messageId }) => {
-      setMessages((prev) => {
-        const idx = prev.findIndex((msg) => msg.id === messageId);
-        if (idx === -1) return prev;
-
-        const toRemove = [];
-
-        if (prev[idx]?.id) toRemove.push(prev[idx].id);
-        if (idx + 1 < prev.length && prev[idx + 1]?.id)
-          toRemove.push(prev[idx + 1].id);
-
-        return prev.filter((msg) => !toRemove.includes(msg.id));
-      });
     });
 
     return () => {
@@ -180,7 +165,6 @@ export default function AskDoubtClient() {
           {
             role: "bot",
             text: "⚠️ Please log in again. User session is missing.",
-            isImg: false,
           },
         ]);
       }
@@ -228,6 +212,7 @@ export default function AskDoubtClient() {
   useEffect(() => {
     fetchUserChats();
   }, []);
+
   useEffect(() => {
     if (!convoId) return;
 
@@ -242,27 +227,22 @@ export default function AskDoubtClient() {
             id: pair.user?.id || null,
             text: pair.user?.text || "[Missing User Message]",
             role: "user",
-            isImg: pair.user?.isImg ?? false, // <-- FIXED
           },
           {
             id: pair.ai?.id || null,
             text: pair.ai?.text || "[Missing AI Response]",
             role: "ai",
-            isImg: pair.ai?.isImg ?? false, // <-- FIXED
           },
         ]);
 
         setMessages(
           formatted.length > 0
             ? formatted
-            : [{ text: "Start A Conversation", role: "system", isImg: false }]
+            : [{ text: "Start A Conversation", from: "system" }]
         );
       } catch (err) {
         console.error("Failed to load conversation", err);
-
-        setMessages([
-          { text: "Start A Conversation", role: "system", isImg: false },
-        ]);
+        setMessages([{ text: "Start A Conversation", from: "system" }]);
       }
     };
 
@@ -355,7 +335,7 @@ export default function AskDoubtClient() {
     if (!userEmail) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "❗ Please login,", isImg: false },
+        { role: "bot", text: "❗ Please login" },
       ]);
       return;
     }
@@ -367,7 +347,6 @@ export default function AskDoubtClient() {
       roomId: convoId,
       senderEmail: userEmail,
       text: input,
-      isImg: false,
     });
     setInput("");
     setLoading(true);
@@ -382,7 +361,6 @@ export default function AskDoubtClient() {
           senderName: userEmail,
           text: input,
           role: "user",
-          isImg: false,
         }),
       });
 
@@ -403,7 +381,6 @@ export default function AskDoubtClient() {
         roomId: convoId,
         senderEmail: "AI",
         text: aiText,
-        isImg: false,
       });
       setLoading(false);
       // 5️⃣ Save AI response in DB
@@ -435,11 +412,7 @@ export default function AskDoubtClient() {
       setError("Something went wrong. Try again.");
       setMessages((prev) => [
         ...prev,
-        {
-          role: "bot",
-          text: "⚠️ Server error. Please try again later.",
-          isImg: false,
-        },
+        { role: "bot", text: "⚠️ Server error. Please try again later." },
       ]);
     } finally {
       setLoading(false);
@@ -540,24 +513,23 @@ export default function AskDoubtClient() {
     if (!userEmail) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "❗ Please login to use chat.", isImg: false },
+        { role: "bot", text: "❗ Please login to use chat." },
       ]);
       return;
     }
 
-    // 1️⃣ Remove all messages below the edited one
+    // 1️⃣ Optimistically remove all messages below the edited one
     setMessages((prev) => prev.slice(0, editIndex + 1));
 
-    // 2️⃣ Insert updated user message immediately
-    const updatedUserMsg = { role: "user", text, isImg: false };
+    // 2️⃣ Add updated user message immediately
+    const updatedUserMsg = { role: "user", text };
     setMessages((prev) => [...prev.slice(0, editIndex), updatedUserMsg]);
-
     setInput("");
     setLoading(true);
     setError("");
 
     try {
-      // 🔹 Delete old messages from DB
+      // 🔹 Delete old messages from backend (those below current index)
       await fetch("/api/delete-below", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -580,16 +552,16 @@ export default function AskDoubtClient() {
 
       const { insertedId: userMessageId } = await userRes.json();
 
-      // 🔹 Fetch fresh AI response
+      // 🔹 Fetch new AI response
       const aiRes = await axios.post("https://askdemia1.onrender.com/chat", {
         user_id: userEmail,
         message: text,
       });
 
       const aiText = aiRes?.data?.response || "Unexpected response format.";
-      const aiMessage = { role: "bot", text: aiText, isImg: false };
+      const aiMessage = { role: "bot", text: aiText };
 
-      // 3️⃣ Add AI message
+      // 3️⃣ Add AI message to UI immediately
       setMessages((prev) => [...prev, aiMessage]);
       setLoading(false);
 
@@ -620,14 +592,10 @@ export default function AskDoubtClient() {
       console.error("Error resending message:", err);
       setError("Something went wrong. Try again.");
 
-      // 4️⃣ Add error message
+      // 4️⃣ Show error response in UI
       setMessages((prev) => [
         ...prev,
-        {
-          role: "bot",
-          text: "⚠️ Server error. Please try again later.",
-          isImg: false,
-        },
+        { role: "bot", text: "⚠️ Server error. Please try again later." },
       ]);
     }
 
@@ -653,20 +621,14 @@ export default function AskDoubtClient() {
       const result = await res.json();
 
       if (result.success) {
-        // Update local UI text + preserve isImg: false
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === editingIndex
-              ? { ...msg, text: editingText, isImg: false }
-              : msg
+            msg.id === editingIndex ? { ...msg, text: editingText } : msg
           )
         );
-
-        const oldIndex = editingIndex;
         setEditingIndex(null);
-
-        // Send updated message as new flow
-        await resendEditedMessage(editingText, oldIndex);
+        // Send it as a new message flow
+        await resendEditedMessage(editingText);
       } else {
         alert("Edit failed: " + result.message);
       }
@@ -678,30 +640,17 @@ export default function AskDoubtClient() {
     setEditingIndex(null);
     setEditingText("");
   };
-
+  
   // handling the deletion of a message
   const handleDeleteMessage = async (id) => {
     setMessages((prev) => {
       const idx = prev.findIndex((msg) => msg.id === id);
       if (idx === -1) return prev;
 
-      const idsToRemove = [];
-
-      // Remove this message
-      if (prev[idx]?.id) idsToRemove.push(prev[idx].id);
-
-      // Remove paired message (next one) only if it has a real ID
-      if (idx + 1 < prev.length && prev[idx + 1]?.id) {
-        idsToRemove.push(prev[idx + 1].id);
-      }
+      const idsToRemove = [id];
+      if (idx + 1 < prev.length) idsToRemove.push(prev[idx + 1].id);
 
       return prev.filter((msg) => !idsToRemove.includes(msg.id));
-    });
-
-    // 🔥 Emit socket event
-    socket.current.emit("delete-message", {
-      roomId: convoId,
-      messageId: id
     });
 
     try {
@@ -713,7 +662,6 @@ export default function AskDoubtClient() {
           convoId,
         }),
       });
-
       console.log("Deleted completely");
     } catch (err) {
       console.error("Delete failed:", err);
@@ -977,8 +925,9 @@ export default function AskDoubtClient() {
         {/* Sidebar */}
         <div
           ref={sidebarRef}
-          className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } lg:translate-x-0`}
+          className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-8">
@@ -1064,10 +1013,11 @@ export default function AskDoubtClient() {
                         <Link
                           href={`/ask-doubt?convoId=${chat.convoId}`}
                           onClick={() => setSelectedConvoId(chat.convoId)}
-                          className={`block text-sm px-4 py-2 rounded-lg transition-colors pr-[25%] truncate w-full relative ${selectedConvoId === chat.convoId
-                            ? "bg-purple-200 text-purple-800"
-                            : "hover:bg-gray-100 text-gray-700"
-                            }`}
+                          className={`block text-sm px-4 py-2 rounded-lg transition-colors pr-[25%] truncate w-full relative ${
+                            selectedConvoId === chat.convoId
+                              ? "bg-purple-200 text-purple-800"
+                              : "hover:bg-gray-100 text-gray-700"
+                          }`}
                           title={chat.name || "New Chat"} // optional: show full name on hover
                         >
                           {chat.name || "New Chat"}
@@ -1325,14 +1275,16 @@ export default function AskDoubtClient() {
                 {messages.map((msg, index) => (
                   <div
                     key={msg.id || index}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                      }`}
+                    className={`flex ${
+                      msg.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                   >
                     <div
-                      className={`px-4 py-3 rounded-xl shadow-md break-words ${msg.role === "user"
-                        ? "bg-purple-100 text-right rounded-br-none self-end  max-w-[70%] sm:max-w-md"
-                        : "bg-blue-100 text-left rounded-bl-none self-start max-w-[90%] sm:max-w-2xl overflow-x-auto"
-                        }`}
+                      className={`px-4 py-3 rounded-xl shadow-md break-words ${
+                        msg.role === "user"
+                          ? "bg-purple-100 text-right rounded-br-none self-end  max-w-[70%] sm:max-w-md"
+                          : "bg-blue-100 text-left rounded-bl-none self-start max-w-[90%] sm:max-w-2xl overflow-x-auto"
+                      }`}
                     >
                       <div className="text-xs font-semibold mb-1">
                         {msg.role === "user" ? "You" : "Bot"}
@@ -1407,14 +1359,14 @@ export default function AskDoubtClient() {
                                         position: "relative",
                                         marginBottom: "1rem",
                                       }}
-                                    >
+                                    > 
                                       <pre className="bg-blue-500 text-white p-4 rounded-md overflow-x-auto text-sm">
                                         <code>
                                           {typeof children === "string"
                                             ? children
                                             : Array.isArray(children)
-                                              ? children.join("")
-                                              : ""}
+                                            ? children.join("")
+                                            : ""}
                                         </code>
                                       </pre>
                                       <div
@@ -1517,10 +1469,11 @@ export default function AskDoubtClient() {
                         </div>
                         {msg.text && (
                           <div
-                            className={`flex gap-4 items-center mt-2 text-xs text-gray-700 ${msg.role === "user"
-                              ? "justify-end"
-                              : "justify-start"
-                              }`}
+                            className={`flex gap-4 items-center mt-2 text-xs text-gray-700 ${
+                              msg.role === "user"
+                                ? "justify-end"
+                                : "justify-start"
+                            }`}
                           >
                             {msg.role === "user" && (
                               <>
@@ -1559,8 +1512,8 @@ export default function AskDoubtClient() {
                                   isPaused
                                     ? "Resume speaking"
                                     : isSpeaking
-                                      ? "Pause speaking"
-                                      : "Play"
+                                    ? "Pause speaking"
+                                    : "Play"
                                 }
                                 className="flex items-center gap-1 text-green-600 hover:text-green-800 transition"
                               >
@@ -1577,8 +1530,8 @@ export default function AskDoubtClient() {
                                   {isPaused
                                     ? "Resume"
                                     : isSpeaking
-                                      ? "Pause"
-                                      : "Play"}
+                                    ? "Pause"
+                                    : "Play"}
                                 </span>
                                 {/* {isSpeaking && (
                                   <button
@@ -1629,10 +1582,11 @@ export default function AskDoubtClient() {
                   />
                   <button
                     onClick={toggleListening}
-                    className={`p-2 rounded-xl border transition ${listening
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-black"
-                      }`}
+                    className={`p-2 rounded-xl border transition ${
+                      listening
+                        ? "bg-red-500 text-white"
+                        : "bg-white text-black"
+                    }`}
                   >
                     {listening ? (
                       <MicOff className="w-5 h-5" />
