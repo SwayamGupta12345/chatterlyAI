@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 export async function POST(req) {
   const { db } = await connectToDatabase();
   const { userEmail, friendEmail, friendName } = await req.json();
-
+ 
   // Validate input
   if (!userEmail || !friendEmail || !friendName) {
     return NextResponse.json(
