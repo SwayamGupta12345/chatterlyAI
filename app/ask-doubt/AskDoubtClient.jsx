@@ -8,8 +8,8 @@ import {
   Lightbulb,
   Menu,
   X,
-  User, 
-  LogOut, 
+  User,
+  LogOut,
   ArrowLeft,
   Send,
   LayoutDashboard,
@@ -583,6 +583,13 @@ export default function AskDoubtClient() {
     // 2️⃣ Add updated user message immediately
     const updatedUserMsg = { role: "user", text };
     setMessages((prev) => [...prev.slice(0, editIndex), updatedUserMsg]);
+    // 🔥 Broadcast updated user message to room
+    socket.current.emit("send-message", {
+      roomId: convoId,
+      senderEmail: userEmail,
+      text,
+    });
+
     setInput("");
     setLoading(true);
     setError("");
@@ -622,6 +629,13 @@ export default function AskDoubtClient() {
 
       // 3️⃣ Add AI message to UI immediately
       setMessages((prev) => [...prev, aiMessage]);
+      // 🔥 Broadcast AI message to all clients
+      socket.current.emit("send-message", {
+        roomId: convoId,
+        senderEmail: "AI",
+        text: aiText,
+      });
+
       setLoading(false);
 
       // 🔹 Save AI response to DB
