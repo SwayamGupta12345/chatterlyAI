@@ -418,7 +418,7 @@ export default function AskDoubtClient() {
       const { insertedId: userMessageId } = await userRes.json();
 
       // 3️⃣ Get AI response from your backend
-      const aiRes = await axios.post("https://askdemia1.onrender.com/chat", {
+      const aiRes = await axios.post(process.env.AGENTIC_BACKEND + "/chat", {
         user_id: userEmail,
         message: input,
       });
@@ -619,7 +619,7 @@ export default function AskDoubtClient() {
       const { insertedId: userMessageId } = await userRes.json();
 
       // 🔹 Fetch new AI response
-      const aiRes = await axios.post("https://askdemia1.onrender.com/chat", {
+      const aiRes = await axios.post(process.env.AGENTIC_BACKEND + "/chat", {
         user_id: userEmail,
         message: text,
       });
