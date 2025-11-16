@@ -103,7 +103,7 @@
 //       if (summaryInput.length > 0) {
 //         try {
 //           const renameRes = await axios.post(
-//             "https://askdemia1.onrender.com/chat",
+//            process.env.AGENTIC_BACKEND + "/chat",
 //             {
 //               user_id: "Name Maker", // or pass actual userEmail if available
 //               message: summaryInput,
@@ -113,7 +113,7 @@
 //     if (err.code === 'ECONNRESET') {
 //       console.warn("ECONNRESET, retrying in 2s...");
 //       await new Promise((res) => setTimeout(res, 2000));
-//       return await axios.post("https://askdemia1.onrender.com/chat", {
+//       return await axios.post("process.env.AGENTIC_BACKEND + "/chat", {
 //         user_id: "Name Maker",
 //         message: summaryInput,
 //       });
@@ -220,7 +220,7 @@ export async function POST(req) {
       try {
         try {
           renameRes = await axios.post(
-            "https://askdemia1.onrender.com/chat",
+            process.env.AGENTIC_BACKEND + "/chat",
             {
               user_id: "Name Maker",
               message: summaryInput,
@@ -234,7 +234,7 @@ export async function POST(req) {
             console.warn("ECONNRESET, retrying in 2s...");
             await new Promise((res) => setTimeout(res, 2000));
             renameRes = await axios.post(
-              "https://askdemia1.onrender.com/chat",
+              process.env.AGENTIC_BACKEND + "/chat",
               {
                 user_id: "Name Maker",
                 message: summaryInput,
