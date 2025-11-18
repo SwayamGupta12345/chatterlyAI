@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
-  Lightbulb,
+  Lightbulb, 
   Menu,
   X,
   User,
