@@ -422,11 +422,11 @@ export default function AskDoubtClient() {
       const { insertedId: userMessageId } = await userRes.json();
 
       // 3️⃣ Get AI response from your backend
-      const aiRes = await axios.post(process.env.AGENTIC_BACKEND + "/chat", {
+      const aiRes = await axios.post("https://chatterly-agentic.onrender.com/chat", {
         user_id: userEmail,
         message: input,
       });
-
+      console.log("AI RESPONSE:", aiRes);
       const aiText = aiRes?.data?.response || "Unexpected response format.";
       const aiMessage = { role: "bot", text: aiText };
 
