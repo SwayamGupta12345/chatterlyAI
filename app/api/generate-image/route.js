@@ -16,7 +16,8 @@ export async function POST(req) {
     const HF_API_KEY = process.env.HF_API_KEY;
 
     const response = await axios.post(
-      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+      // "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-dev",
       { inputs: prompt },
       {
         headers: {
