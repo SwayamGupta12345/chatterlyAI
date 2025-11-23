@@ -29,7 +29,7 @@
 //   const handleCopy = (text) => navigator.clipboard.writeText(text);
 //   const sendToWhatsApp = (text) => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
 //   const sendToGmail = (text) => {
-//     const subject = encodeURIComponent("Chatterly");
+//     const subject = encodeURIComponent("ChatterlyAI");
 //     const body = encodeURIComponent(text);
 //     const gmailUrl = `https://mail.google.com/mail/u/0/?fs=1&to=&su=${subject}&body=${body}&tf=cm`;
 //     window.open(gmailUrl, "_blank");

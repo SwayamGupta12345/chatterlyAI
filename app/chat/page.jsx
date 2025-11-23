@@ -63,7 +63,7 @@ export default function AskDoubtPage() {
   const sendToWhatsApp = (text) =>
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
   const sendToGmail = (text) => {
-    const subject = encodeURIComponent("Chatterly");
+    const subject = encodeURIComponent("ChatterlyAI");
     const body = encodeURIComponent(text);
     const gmailUrl = `https://mail.google.com/mail/u/0/?fs=1&to=&su=${subject}&body=${body}&tf=cm`;
     window.open(gmailUrl, "_blank");
@@ -184,7 +184,7 @@ export default function AskDoubtPage() {
   useEffect(() => {
     if (!userEmail) return;
     if (!socket.current) {
-      socket.current = io("https://chatterly-backend-8dwx.onrender.com", {
+      socket.current = io("https://ChatterlyAI-backend-8dwx.onrender.com", {
         transports: ["websocket"], // ensure real-time connection
       });
       socket.current.emit("join-room", userEmail);
@@ -707,7 +707,7 @@ export default function AskDoubtPage() {
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Chatterly
+                ChatterlyAI
               </span>
             </div>
 

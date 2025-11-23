@@ -31,7 +31,7 @@ export default function LandingPage() {
     {
       name: "Sarah Chen",
       role: "Computer Science Student",
-      content: "Chatterly transformed my study routine. The collaborative doubt-solving feature is incredible!",
+      content: "ChatterlyAI transformed my study routine. The collaborative doubt-solving feature is incredible!",
       rating: 5,
     },
     {
@@ -66,7 +66,7 @@ export default function LandingPage() {
                 <BookOpen className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Chatterly
+                ChatterlyAI
               </span>
             </div>
 
@@ -154,7 +154,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 pb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Why Choose Chatterly?
+              Why Choose ChatterlyAI?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Discover the features that make learning engaging, collaborative, and effective.
@@ -224,7 +224,7 @@ export default function LandingPage() {
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-lg flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Chatterly</span>
+                <span className="text-xl font-bold">ChatterlyAI</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
                 Empowering students worldwide with collaborative AI assistance and chat system with friends for better and more effective learning.
@@ -308,7 +308,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 Chatterly. All rights reserved.</p>
+            <p>&copy; 2024 ChatterlyAI. All rights reserved.</p>
           </div>
         </div>
       </footer> */}
@@ -320,7 +320,7 @@ export default function LandingPage() {
                 <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-blue-400 rounded-lg flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold">Chatterly</span>
+                <span className="text-xl font-bold">ChatterlyAI</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
                 Empowering students worldwide with collaborative AI assistance and chat system with friends for better and more effective learning.
@@ -429,7 +429,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 Chatterly. All rights reserved.</p>
+            <p>&copy; 2024 ChatterlyAI. All rights reserved.</p>
           </div>
         </div>
       </footer>

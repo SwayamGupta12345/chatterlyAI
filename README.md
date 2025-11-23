@@ -1,8 +1,8 @@
-# Chatterly
+# ChatterlyAI
 
-[Live Demo](https://chatterly-delta.vercel.app)
+[Live Demo](https://ChatterlyAI-delta.vercel.app)
 
-Chatterly is a web application project built with Next.js, JavaScript, TypeScript, and Tailwind CSS. It is designed to offer a robust, modern user experience, leveraging strong authentication and a rich component library.
+ChatterlyAI is a web application project built with Next.js, JavaScript, TypeScript, and Tailwind CSS. It is designed to offer a robust, modern user experience, leveraging strong authentication and a rich component library.
 
 ## Table of Contents
 
@@ -35,7 +35,7 @@ Chatterly is a web application project built with Next.js, JavaScript, TypeScrip
 - `tsconfig.json` — TypeScript configuration for strict typing and path aliases.
 - `components.json` — UI component library and alias setup.
 
-Explore more files and folders in your [GitHub repository](https://github.com/rishugoyal805/Chatterly).
+Explore more files and folders in your [GitHub repository](https://github.com/rishugoyal805/ChatterlyAI).
 
 ## Tech Stack
 
@@ -50,8 +50,8 @@ Explore more files and folders in your [GitHub repository](https://github.com/ri
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/rishugoyal805/Chatterly.git
-cd Chatterly
+git clone https://github.com/rishugoyal805/ChatterlyAI.git
+cd ChatterlyAI
 npm install    # or pnpm install
 ```
 
