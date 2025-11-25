@@ -91,7 +91,6 @@ export default function LoginPage() {
         redirect: false,
         email: formData.email,
         password: formData.password,
-        callbackUrl: "/dashboard",
       });
       if (!res) {
         setError("Something went wrong");
@@ -103,7 +102,8 @@ export default function LoginPage() {
       } 
       else {
         // success
-        router.push("/dashboard");
+        await new Promise(r => setTimeout(r, 300));
+        router.replace("/dashboard");
       }
     } catch (err) {
       console.error("SignIn error:", err);
