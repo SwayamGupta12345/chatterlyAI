@@ -184,7 +184,7 @@ export default function AskDoubtPage() {
   useEffect(() => {
     if (!userEmail) return;
     if (!socket.current) {
-      socket.current = io("https://ChatterlyAI-backend-8dwx.onrender.com", {
+      socket.current = io("https://Chatterly-backend-8dwx.onrender.com", {
         transports: ["websocket"], // ensure real-time connection
       });
       socket.current.emit("join-room", userEmail);
