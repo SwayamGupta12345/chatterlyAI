@@ -123,9 +123,8 @@ export default function Dashboard() {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        className={`fixed left-0 top-0 h-full w-64 bg-white/80 backdrop-blur-md border-r border-white/20 z-50 transform transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0`}
       >
         <div className="p-6">
           <div className="flex items-center space-x-2 mb-8 py-3 px-4">
@@ -284,7 +283,7 @@ export default function Dashboard() {
                 {filteredFriends.map((f) => (
                   <div
                     key={f.chatbox_id}
-                    onClick={() => router.push(`/chat?convoId=${f.chatbox_id}`)}
+                    onClick={() => router.push(`/chat?chatboxId=${f.chatbox_id}`)}
                     className="p-3 bg-white/50 hover:bg-white/70 cursor-pointer rounded-xl border border-white/20 flex justify-between items-center"
                   >
                     <span className="font-medium">{f.nickname || f.email}</span>
