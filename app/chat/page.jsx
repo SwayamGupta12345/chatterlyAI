@@ -1,6 +1,7 @@
+//Chat page
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import {
   Lightbulb,
   Menu,
@@ -25,10 +26,23 @@ import { FaCopy, FaWhatsapp, FaEnvelope } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { RiEditLine } from "react-icons/ri";
 import { getSession } from "next-auth/react";
-import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AskDoubtPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-4 text-center text-gray-600">
+          Loading chat...
+        </div>
+      }
+    >
+      <ChatPageInner />
+    </Suspense>
+  );
+}
+
+function ChatPageInner() {
   const menuRef = useRef(null);
   const menuRefs = useRef({});
   const deleteModalRef = useRef(null);
