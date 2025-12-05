@@ -1409,7 +1409,7 @@ export default function AskDoubtClient() {
             </div>
           </header>
           {showShare && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
               <div className="bg-white rounded-xl shadow-xl p-6  max-w-md relative">
                 {/* Title */}
                 <h2 className="text-lg font-semibold mb-4">Share this Chat</h2>
