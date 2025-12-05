@@ -67,6 +67,7 @@ export default function AskDoubtClient() {
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
   const [showShare, setShowShare] = useState(false);
+  const [shared, setShared] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingText, setEditingText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -579,6 +580,7 @@ export default function AskDoubtClient() {
 
       alert("Chat shared successfully!");
       setShowShare(false);
+      setShared(true);
       setSearchQuery("");
       setSearchResults([]);
       setSelectedUser("");
@@ -1468,10 +1470,15 @@ export default function AskDoubtClient() {
                         <button
                           onClick={() => handleSendShare("gmail")}
                           className="flex items-center justify-center sm:justify-start 
-                     text-sm bg-blue-600 text-white px-3 py-2 rounded-lg 
-                     hover:bg-blue-700 transition w-full sm:w-auto"
+                     text-sm bg-gray-600 text-white px-3 py-2 rounded-lg 
+                     hover:bg-gray-700 transition w-full sm:w-auto"
                         >
-                          <Mail className="w-4 h-4 mr-2" />
+                          <img
+                            src="/gmail.png" // make sure this path is correct in your public folder
+                            alt="Gmail"
+                            className="w-4 h-4 mr-2"
+                          />
+                          {/* <Mail className="w-4 h-4 mr-2" /> */}
                           Gmail
                         </button>
 
@@ -1506,6 +1513,33 @@ export default function AskDoubtClient() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+          {shared && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+              <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-sm w-full text-center flex flex-col items-center gap-4">
+                {/* Message */}
+                <p className="text-gray-900 text-xl sm:text-2xl font-semibold mt-2">
+                  Chat is shared!
+                </p>
+
+                {/* Confirmation Video */}
+                <video
+                  src="/confirmation1.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover rounded-xl"
+                />
+
+                {/* OK Button */}
+                <button
+                  onClick={() => setShared(false)}
+                  className="bg-purple-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-xl text-lg sm:text-xl font-semibold hover:bg-purple-700 transition mt-4"
+                >
+                  OK
+                </button>
               </div>
             </div>
           )}
