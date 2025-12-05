@@ -67,19 +67,28 @@ export default function LandingPage() {
     },
   ];
 
+  // useEffect(() => {
+  //   void Promise.all([
+  //     fetch("https://chatterly-backend-8dwx.onrender.com/health", {
+  //       cache: "no-cache",
+  //     }),
+  //     fetch("https://chatterly-agentic-d4ai.onrender.com/health", {
+  //       cache: "no-cache",
+  //     }),
+  //     fetch("https://chatterly-agentic-d4ai.onrender.com/ping", {
+  //       cache: "no-cache",
+  //     }),
+  //   ]).catch(console.error);
+  // }, []);
+
   useEffect(() => {
-    void Promise.all([
-      fetch("https://chatterly-backend-8dwx.onrender.com/health", {
-        cache: "no-cache",
-      }),
-      fetch("https://chatterly-agentic-d4ai.onrender.com/health", {
-        cache: "no-cache",
-      }),
-      fetch("https://chatterly-agentic-d4ai.onrender.com/ping", {
-        cache: "no-cache",
-      }),
-    ]).catch(console.error);
-  }, []);
+    Promise.allSettled([
+      fetch("https://chatterly-backend-8dwx.onrender.com/health", { cache: "no-cache" }),
+      fetch("https://chatterly-agentic-d4ai.onrender.com/health", { cache: "no-cache" }),
+    ]).then(results => {
+      console.log("Server health:", results)
+    })
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -289,11 +298,10 @@ export default function LandingPage() {
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentTestimonial
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentTestimonial
                       ? "bg-purple-600 scale-125"
                       : "bg-purple-200 hover:bg-purple-400"
-                  }`}
+                    }`}
                 />
               ))}
             </div>
