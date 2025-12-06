@@ -149,13 +149,13 @@ function ChatPageInner() {
         }
       }
 
-      const lastId = localStorage.getItem("lastChatboxId");
-      if (lastId) {
-        const last = data.friends.find((f) => f.chatbox_id === lastId);
-        if (last) {
-          handleFriendSelect(last);
-        }
-      }
+      // const lastId = localStorage.getItem("lastChatboxId");
+      // if (lastId) {
+      //   const last = data.friends.find((f) => f.chatbox_id === lastId);
+      //   if (last) {
+      //     handleFriendSelect(last);
+      //   }
+      // }
     };
     fetchFriends();
   }, [userEmail]);
@@ -230,7 +230,7 @@ function ChatPageInner() {
 
       // 2️⃣ After online registered, request full list
       socket.current.emit("request-online-users");
-      
+
       socket.current.on("user-online-status", ({ email, isOnline }) => {
         setOnlineMap((prev) => ({
           ...prev,
@@ -623,7 +623,7 @@ function ChatPageInner() {
 
   const handleFriendSelect = async (friend) => {
     setSelectedFriend(friend);
-    localStorage.setItem("lastChatboxId", friend.chatbox_id);
+    // localStorage.setItem("lastChatboxId", friend.chatbox_id);
     router.replace(`/chat?chatboxId=${friend.chatbox_id}`);
 
     // Step 1: Fetch chatbox details
