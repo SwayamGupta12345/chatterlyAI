@@ -1024,16 +1024,23 @@ export default function AskDoubtClient() {
   const speakText = (text) => {
     if (!text) return;
 
-    if (speechSynthesis.speaking) {
-      if (speechSynthesis.paused) {
-        speechSynthesis.resume();
-        setIsPaused(false);
-      } else {
-        speechSynthesis.pause();
-        setIsPaused(true);
-      }
+    // --- CASE 1: Currently speaking & not paused → PAUSE ---
+    if (speechSynthesis.speaking && !speechSynthesis.paused && isSpeaking) {
+      speechSynthesis.pause();
+      setIsPaused(true);
       return;
     }
+
+    // --- CASE 2: Currently speaking & paused → RESUME ---
+    if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      setIsPaused(false);
+      return;
+    }
+
+    // --- CASE 3: Not speaking → start NEW utterance ---
+    // (Cancel any leftover old utterances)
+    speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
@@ -1744,7 +1751,7 @@ export default function AskDoubtClient() {
                                         marginBottom: "1rem",
                                       }}
                                     >
-                                      <pre className="bg-blue-400 text-white p-4 rounded-md overflow-x-auto text-sm">
+                                      <pre className="bg-blue-300 text-black p-4 rounded-md overflow-x-auto text-sm">
                                         <code>{text}</code>
                                       </pre>
 
@@ -1762,7 +1769,7 @@ export default function AskDoubtClient() {
                                           title="Copy"
                                           style={{
                                             background: "none",
-                                            color: "white",
+                                            color: "black",
                                             border: "none",
                                             cursor: "pointer",
                                           }}
@@ -1775,7 +1782,7 @@ export default function AskDoubtClient() {
                                           title="Share via WhatsApp"
                                           style={{
                                             background: "none",
-                                            color: "white",
+                                            color: "green",
                                             border: "none",
                                             cursor: "pointer",
                                           }}
@@ -1788,12 +1795,20 @@ export default function AskDoubtClient() {
                                           title="Send via Email"
                                           style={{
                                             background: "none",
-                                            color: "white",
+                                            color: "black",
                                             border: "none",
                                             cursor: "pointer",
                                           }}
                                         >
-                                          <FaEnvelope />
+                                          {/* <FaEnvelope /> */}
+                                          <img
+                                            src="/gmail.png"
+                                            alt="Gmail"
+                                            style={{
+                                              width: "16px",
+                                              height: "16px",
+                                            }}
+                                          />
                                         </button>
                                       </div>
                                     </div>
@@ -1898,7 +1913,6 @@ export default function AskDoubtClient() {
                                   <FaCopy className="w-4 h-4" />
                                   <span className="text-sm">Copy</span>
                                 </button>
-
                                 {/* WhatsApp */}
                                 <button
                                   onClick={() => sendToWhatsApp(msg.text)}
@@ -1908,7 +1922,19 @@ export default function AskDoubtClient() {
                                   <FaWhatsapp className="w-4 h-4" />
                                   <span className="text-sm">WhatsApp</span>
                                 </button>
-
+                                {/* Gmail */}
+                                <button
+                                  onClick={() => sendToGmail(msg.text)}
+                                  title="Send via Email"
+                                  className="flex items-center gap-1 text-red-600 hover:text-red-700 transition"
+                                >
+                                  <img
+                                    src="/gmail.png"
+                                    alt="Gmail"
+                                    className="w-4 h-4"
+                                  />
+                                  <span className="text-sm">Gmail</span>
+                                </button>
                                 {/* Speak / Pause */}
                                 <button
                                   onClick={() => speakText(msg.text)}
