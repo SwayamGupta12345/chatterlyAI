@@ -5,6 +5,20 @@ import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+// Reusable password rule component
+const PasswordCheck = ({ label, valid }) => {
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      {valid ? (
+        <span className="text-green-600 font-bold">✔</span>
+      ) : (
+        <span className="text-red-500 font-bold">✘</span>
+      )}
+      <span className={valid ? "text-green-600" : "text-red-500"}>{label}</span>
+    </div>
+  );
+};
+
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     email: "",
@@ -17,6 +31,26 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const router = useRouter();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  // Password validation rules
+  const password = formData.password;
+  const confirmPassword = formData.confirmPassword;
+
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password),
+    match: password && password === confirmPassword,
+  };
+
+  const allGood =
+    passwordChecks.length &&
+    passwordChecks.upper &&
+    passwordChecks.number &&
+    passwordChecks.special &&
+    passwordChecks.match;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -27,7 +61,12 @@ export default function SignupPage() {
       setIsLoading(false);
       return;
     }
-
+    if (!allGood) {
+      setError("Password requirements not met.");
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
     try {
       const response = await fetch("/api/signup", {
         method: "POST",
@@ -147,7 +186,14 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12"
+                  className={`w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12"
+                   ${
+                     password.length === 0
+                       ? "border border-gray-200 focus:ring-purple-500"
+                       : allGood
+                       ? "border border-green-500 focus:ring-green-500"
+                       : "border border-red-500 focus:ring-red-500"
+                   }`}
                   placeholder="Create a password"
                 />
                 <button
@@ -179,7 +225,14 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12"
+                  className={`w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12"
+                   ${
+                     confirmPassword.length === 0
+                       ? "border border-gray-200 focus:ring-purple-500"
+                       : passwordChecks.match
+                       ? "border border-green-500 focus:ring-green-500"
+                       : "border border-red-500 focus:ring-red-500"
+                   }`}
                   placeholder="Confirm your password"
                 />
                 <button
@@ -195,7 +248,33 @@ export default function SignupPage() {
                 </button>
               </div>
             </div>
+            {/* Password Rules */}
+            {password.length > 0 && (
+              <div className="mt-2 space-y-1">
+                <PasswordCheck
+                  label="At least 8 characters"
+                  valid={passwordChecks.length}
+                />
+                <PasswordCheck
+                  label="One uppercase letter"
+                  valid={passwordChecks.upper}
+                />
+                <PasswordCheck
+                  label="One number"
+                  valid={passwordChecks.number}
+                />
+                <PasswordCheck
+                  label="One special character"
+                  valid={passwordChecks.special}
+                />
+                <PasswordCheck
+                  label="Passwords match"
+                  valid={passwordChecks.match}
+                />
+              </div>
+            )}
 
+            {/* Terms */}
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -220,6 +299,7 @@ export default function SignupPage() {
               </span>
             </div>
 
+            {/* submit */}
             <button
               type="submit"
               disabled={isLoading}
@@ -236,6 +316,7 @@ export default function SignupPage() {
             </button>
           </form>
 
+          {/* Google login */}
           <div className="my-6 text-center">
             <p className="text-gray-500 mb-2">or sign up with</p>
             <button
