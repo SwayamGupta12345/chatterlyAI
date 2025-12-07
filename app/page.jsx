@@ -343,9 +343,9 @@ export default function LandingPage() {
                 <span className="text-xl font-bold">ChatterlyAI</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
-                Empowering students worldwide with collaborative AI assistance
+                Empowering people worldwide with collaborative AI assistance
                 and chat system with friends for better and more effective
-                learning.
+                collaboration.
               </p>
               <div className="text-sm text-gray-400 space-y-1">
                 <p className="text-white font-semibold mb-2">Made by:</p>
