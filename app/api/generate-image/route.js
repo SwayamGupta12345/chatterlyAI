@@ -30,7 +30,7 @@ export async function POST(req) {
       }
     );
 
-    console.log("HF STATUS:", response.status);
+    // console.log("HF STATUS:", response.status);
 
     if (response.status !== 200) {
       let text = "";

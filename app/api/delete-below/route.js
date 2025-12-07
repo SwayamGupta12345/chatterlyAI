@@ -7,7 +7,7 @@ export async function POST(req) {
     const { convoId, index } = await req.json();
  
     if (!convoId || index === undefined || !ObjectId.isValid(convoId)) {
-      console.log("Invalid convoId or index:", { convoId, index });
+      // console.log("Invalid convoId or index:", { convoId, index });
       return NextResponse.json(
         { success: false, message: "Invalid convoId or index" },
         { status: 400 }
@@ -31,7 +31,7 @@ export async function POST(req) {
     const messagesArray = convo.messages || [];
 
     if (index < 0 || index >= messagesArray.length) {
-      console.log("Invalid index:", index);
+      // console.log("Invalid index:", index);
       return NextResponse.json(
         { success: false, message: "Invalid index" },
         { status: 400 }
@@ -75,7 +75,7 @@ export async function POST(req) {
       deletedCount: messageIdsToDelete.length,
     });
   } catch (error) {
-    console.error("Error deleting messages below index:", error);
+    // console.error("Error deleting messages below index:", error);
     return NextResponse.json(
       { success: false, message: "Server error" },
       { status: 500 }

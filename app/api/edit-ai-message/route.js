@@ -38,13 +38,13 @@ export async function POST(req) {
         await db.collection('messages').deleteMany({
             _id: { $in: idsToDelete }
         });
-        console.log("deleted many ")
+        // console.log("deleted many ")
         // Trim the conversation to remove message pairs from index onwards
         await db.collection('conversations').updateOne(
             { _id: new ObjectId(convoId) },
             { $set: { messages: conversation.messages.slice(0, index) } }
         );
-        console.log("updated many ")
+        // console.log("updated many ")
         return NextResponse.json({
             success: true,
             deletedCount: idsToDelete.length,
@@ -53,7 +53,7 @@ export async function POST(req) {
         });
 
     } catch (error) {
-        console.error('Error editing AI message:', error);
+        // console.error('Error editing AI message:', error);
         return NextResponse.json({ success: false, message: 'Server error' }, { status: 500 });
     }
 }

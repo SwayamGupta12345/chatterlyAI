@@ -36,7 +36,7 @@ export async function POST(req) {
         .collection("frnd_msg")
         .deleteMany({ _id: { $in: messageIds } });
 
-      console.log(`🗑 Deleted ${deleteMsgResult.deletedCount} related messages.`);
+      // console.log(`🗑 Deleted ${deleteMsgResult.deletedCount} related messages.`);
     }
 
     // ✅ Delete the chatbox itself

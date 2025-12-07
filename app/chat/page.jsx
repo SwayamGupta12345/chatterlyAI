@@ -563,14 +563,14 @@ function ChatPageInner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userEmail, friendEmail, friendName }),
       });
-      console.log(
-        "userEmail:",
-        userEmail,
-        "friendEmail:",
-        friendEmail,
-        "friendName:",
-        friendName
-      );
+      // console.log(
+      //   "userEmail:",
+      //   userEmail,
+      //   "friendEmail:",
+      //   friendEmail,
+      //   "friendName:",
+      //   friendName
+      // );
       const data = await res.json();
 
       if (data.success) {
