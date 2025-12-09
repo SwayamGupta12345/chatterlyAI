@@ -5,7 +5,16 @@
 
 ChatterlyAI is a full-stack AI chat system built with a **Next.js frontend** and **three independent backend services**, deployed separately due to platform constraints (Vercel + Render free tiers).
 
-<img width="1919" height="907" alt="Screenshot 2025-12-09 211708" src="https://github.com/user-attachments/assets/61068eee-f25d-4bf7-8c5f-70d39a1365c0" />
+# Project Screenshots
+
+![Main Screenshot](https://github.com/user-attachments/assets/61068eee-f25d-4bf7-8c5f-70d39a1365c0)
+![Dashboard](https://github.com/user-attachments/assets/71457101-7da0-49bf-a953-b975b1859be9)
+![Features](https://github.com/user-attachments/assets/41424310-4d60-4183-8a9c-180cb6e73337)
+![AI Text](https://github.com/user-attachments/assets/ec9efbe3-b2b2-4a11-9d4d-1ed062fc7f9a)
+![Share](https://github.com/user-attachments/assets/3183846b-0198-4f74-ac9d-463babf54e9b)
+![Image Generated](https://github.com/user-attachments/assets/aeb22808-3533-4120-bf39-a9a75d288705)
+![Chat With Friends](https://github.com/user-attachments/assets/da796204-5138-4c9f-a8d1-abd150f64774)
+
 
 ## What this project does
 ChatterlyAI is a full-stack, collaborative AI chat platform that lets multiple users interact with AI in real-time.
