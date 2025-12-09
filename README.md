@@ -1,3 +1,6 @@
+![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)
+
+
 # Chatterly — Full Multi-Service Open Source AI Chat Platform
 
 Chatterly is a full-stack AI chat system built with a **Next.js frontend** and **three independent backend services**, deployed separately due to platform constraints (Vercel + Render free tiers).
@@ -74,4 +77,6 @@ See → [`docs/ROADMAP.md`](./docs/ROADMAP.md)
 ---
 
 ## 📜 License
-MIT License
+This project is licensed under the CC BY-NC 4.0 License.  
+You may use, modify, and share it for non-commercial purposes with attribution.
+
