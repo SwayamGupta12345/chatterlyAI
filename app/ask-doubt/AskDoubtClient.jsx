@@ -85,6 +85,7 @@ export default function AskDoubtClient() {
   // const convoId = searchParams.get("convoId");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const reNameRef = useRef(null);
   const router = useRouter();
   const handleCopy = (text) => navigator.clipboard.writeText(text);
   const sendToWhatsApp = (text) =>
@@ -96,6 +97,18 @@ export default function AskDoubtClient() {
     const gmailUrl = `https://mail.google.com/mail/u/0/?fs=1&to=${to}&su=${subject}&body=${body}&tf=cm`;
     window.open(gmailUrl, "_blank");
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (reNameRef.current && !reNameRef.current.contains(event.target)) {
+        setEditingChatId(null); // cancel editing
+        setNewChatName(""); // optional: reset input value
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [reNameRef]);
   //listening ai message
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -1192,7 +1205,7 @@ export default function AskDoubtClient() {
                     >
                       <AnimatePresence>
                         {editingChatId === chat._id ? (
-                          <div className="px-4 py-[6px]">
+                          <div ref={reNameRef} className="px-4 py-[6px]">
                             <input
                               type="text"
                               value={newChatName}
