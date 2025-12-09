@@ -44,6 +44,10 @@ Follow instructions here: https://github.com/SwayamGupta12345/ChatterlyAI-agenti
 
 ### 4. Start Frontend  
 
+## Environment Variables
+Rename `environment-variables.txt` to `.env.local ` and fill values for local development:
+
+
 Clone the repository and install dependencies:
 
 ```bash
