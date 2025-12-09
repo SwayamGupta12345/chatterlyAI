@@ -55,7 +55,7 @@ Can run on localhost: 8080
 
 ## Environment Variables
 Can run on localhost: 3000
-Rename `environment-variables.txt` to `.env.local ` and fill values for local development:
+Rename `.env.example` to `.env.local ` and fill values for local development:
 ```
 NEXTAUTH_URL=<localhost_url>
 NEXTAUTH_SECRET=<your_nextauth_secret>
