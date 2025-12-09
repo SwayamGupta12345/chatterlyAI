@@ -34,16 +34,13 @@ Full architecture → [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 If you want to run everything locally:
 
 ### 1. Start Backend 1  
-Follow instructions here:  
-https://github.com/SwayamGupta12345/chatterly-backend
+Follow instructions here: https://github.com/SwayamGupta12345/chatterly-backend
 
 ### 2. Start Backend 2  
-Follow instructions here:
-https://github.com/SwayamGupta12345/chatterly-backend-2
+Follow instructions here: https://github.com/SwayamGupta12345/chatterly-backend-2
 
 ### 3. Start Agentic Service 
-Follow instructions here:
-https://github.com/SwayamGupta12345/chatterly-agentic
+Follow instructions here: https://github.com/SwayamGupta12345/chatterly-agentic
 
 ### 4. Start Frontend  
 
