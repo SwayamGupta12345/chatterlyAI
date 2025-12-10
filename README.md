@@ -50,7 +50,7 @@ Full architecture → [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 If you want to run everything locally, start the services in this order: Backend 1 → Backend 2 → Agentic → Frontend.
 
 ### 1. Start Backend 1  
-Follow instructions here: https://github.com/rishugoyal805/ChatterlyAi_Backend_1.git
+Follow instructions here: https://github.com/rishugoyal805/ChatterlyAI_Backend_1.git
 Can run on localhost: 3001
 Follow repo instructions: npm install → npm run dev → node server-socket.js
 
