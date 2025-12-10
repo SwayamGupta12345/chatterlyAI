@@ -1,58 +1,105 @@
-# ChatterlyAI
+![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)
 
-[Live Demo](https://ChatterlyAI-delta.vercel.app)
 
-ChatterlyAI is a web application project built with Next.js, JavaScript, TypeScript, and Tailwind CSS. It is designed to offer a robust, modern user experience, leveraging strong authentication and a rich component library.
+# ChatterlyAI — Full Multi-Service Open Source AI Chat Platform
 
-## Table of Contents
+ChatterlyAI is a full-stack AI chat system built with a **Next.js frontend** and **three independent backend services**, deployed separately due to platform constraints (Vercel + Render free tiers).
 
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Scripts](#scripts)
-- [Configuration](#configuration)
-- [License](#license)
+# Project Screenshots
 
-## Features
+![Main Screenshot](https://github.com/user-attachments/assets/61068eee-f25d-4bf7-8c5f-70d39a1365c0)
+![Dashboard](https://github.com/user-attachments/assets/71457101-7da0-49bf-a953-b975b1859be9)
+![Features](https://github.com/user-attachments/assets/41424310-4d60-4183-8a9c-180cb6e73337)
+![AI Text](https://github.com/user-attachments/assets/ec9efbe3-b2b2-4a11-9d4d-1ed062fc7f9a)
+![Share](https://github.com/user-attachments/assets/3183846b-0198-4f74-ac9d-463babf54e9b)
+![Image Generated](https://github.com/user-attachments/assets/aeb22808-3533-4120-bf39-a9a75d288705)
+![Chat With Friends](https://github.com/user-attachments/assets/da796204-5138-4c9f-a8d1-abd150f64774)
 
-- **Authentication Middleware**: Custom JWT and NextAuth integration for secure access (`middleware.js`).
-- **Component Library**: Uses shadcn/ui and Radix UI for accessible, customizable components.
-- **Modern Styling**: Tailwind CSS with a custom configuration.
-- **TypeScript Support**: Strong typing and modern JavaScript/TypeScript standards.
-- **API Integration**: Ready for backend/API connections using Express, MongoDB, Mongoose, and Axios.
-- **Easy Theming**: Next-themes and Tailwind for dark mode and theme customization.
 
-## Project Structure
+## What this project does
+ChatterlyAI is a full-stack, collaborative AI chat platform that lets multiple users interact with AI in real-time.
+It integrates a Next.js frontend with three independent backend services, providing a seamless chat experience without switching apps or refreshing pages.
+The system is designed to be easy to set up and extend, allowing contributors to experiment, modify, and enhance the platform collaboratively.
 
-> Note: Only a partial file list is shown. For the full structure, see your repository on GitHub.
+This repository contains:
+- The **official frontend**
+- All **system documentation**
+- Links to all backend microservices
+- Setup guides for contributors
 
-- `middleware.js` — Authentication logic for protected routes.
-- `tailwind.config.ts` — Tailwind CSS configuration and theme extension.
-- `next.config.mjs` — Next.js build and image config.
-- `postcss.config.mjs` — PostCSS plugins for CSS processing.
-- `package.json`, `package-lock.json`, `pnpm-lock.yaml` — Dependency and package management.
-- `tsconfig.json` — TypeScript configuration for strict typing and path aliases.
-- `components.json` — UI component library and alias setup.
+Live App → https://chatterlyai.vercel.app
 
-Explore more files and folders in your [GitHub repository](https://github.com/rishugoyal805/ChatterlyAI).
+---
 
-## Tech Stack
+## 📌 System Architecture
+ChatterlyAI consists of **4 repositories working together**:
 
-- **Frontend**: Next.js, React, TypeScript, JavaScript, Tailwind CSS, PostCSS
-- **UI Libraries**: shadcn/ui, Radix UI, Lucide Icons
-- **Backend/Server**: Express.js, MongoDB, Mongoose
-- **Auth & Security**: NextAuth, JWT, bcryptjs
-- **Other**: Axios, dotenv, framer-motion, and more
+| Service | Repo Link | Tech | Deploy |
+|--------|-----------|------|--------|
+| Frontend (Main) | https://github.com/rishugoyal805/ChatterlyAI.git | Next.js | Vercel |
+| Backend API | https://github.com/rishugoyal805/ChatterlyAi_Backend_1.git | Node.js | Render |
+| Secondary Backend | https://github.com/rishugoyal805/ChatterlyAI_Backend_2.git | Node.js | Render |
+| Agentic Backend | https://github.com/rishugoyal805/ChatterlyAI_Agentic.git | Python/CrewAI | Render |
 
-## Getting Started
+Full architecture → [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
+
+---
+
+## 🚀 Local Development
+
+If you want to run everything locally, start the services in this order: Backend 1 → Backend 2 → Agentic → Frontend.
+
+### 1. Start Backend 1  
+Follow instructions here: https://github.com/rishugoyal805/ChatterlyAi_Backend_1.git
+Can run on localhost: 3001
+Follow repo instructions: npm install → npm run dev → node server-socket.js
+
+### 2. Start Backend 2  
+Follow instructions here: https://github.com/rishugoyal805/ChatterlyAI_Backend_2.git
+Can run on localhost: 3002
+Follow repo instructions: npm install → npm run dev → node server-socket.js
+
+### 3. Start Agentic Service 
+Follow instructions here: https://github.com/rishugoyal805/ChatterlyAI_Agentic.git
+Can run on localhost: 8080
+Follow repo instructions: pip install -r requirements.txt → uvicorn backend:app 8080 --reload
+
+### 4. Start Frontend  
+
+## Environment Variables
+Can run on localhost: 3000
+Rename `.env.example` to `.env.local` and fill values for local development:
+
+```
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=<your_nextauth_secret>
+
+MONGODB_URI=<your_mongodb_connection_string>
+MONGODB_DB=<your_database_name>
+
+JWT_SECRET=<your_jwt_secret>
+
+GOOGLE_CLIENT_ID=<your_google_client_id>
+GOOGLE_CLIENT_SECRET=<your_google_client_secret>
+
+HF_API_KEY=<your_huggingface_api_key>
+
+CLOUDINARY_NAME=<your_cloudinary_cloud_name>
+CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+CLOUDINARY_SECRET=<your_cloudinary_api_secret>
+CLOUDINARY_URL=cloudinary://<your_cloudinary_api_key>:<your_cloudinary_api_secret>@<your_cloudinary_cloud_name>
+
+NEXT_PUBLIC_AGENTIC_BACKEND_URL=<your_agentic_backend_url> 
+NEXT_PUBLIC_AI_SOCKET_BACKEND_URL=<your_ai_socket_backend_url>
+NEXT_PUBLIC_CHAT_SOCKET_BACKEND_URL=<your_chat_socket_backend_url>
+```
 
 Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/rishugoyal805/ChatterlyAI.git
 cd ChatterlyAI
-npm install    # or pnpm install
+npm install    
 ```
 
 ### Development
@@ -60,40 +107,26 @@ npm install    # or pnpm install
 ```bash
 npm run dev
 ```
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-## Scripts
-
-Common scripts from `package.json`:
-
-- `dev` — Start development server
-- `build` — Build the application
-- `start` — Start the production server
-- `lint` — Run linter
-
-## Configuration
-
-- Environment variables are required for JWT secret, database, and other integrations. Set them in a `.env` file.
-- Adjust Tailwind styles in `tailwind.config.ts`.
-- Modify Next.js settings in `next.config.mjs`.
-- Extend or customize component aliases in `components.json`.
-
-## License
-
-This project is private and does not have a public license by default.
+### Note: Make sure backend URLs in your environment variables match the ports above. Check CORS settings if requests fail.
+It doesn't matter which ports you run the services on, just make sure URLs in your environment variables are correct and CORS settings allow requests.
 
 ---
 
-> **Note:** Only a subset of files is listed here. For more details, browse the repository directly on GitHub. 
+## 🧩 Contributing
+Contributions are welcome!  
+Start here → [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+
+If you're new:
+- Check `good-first-issues`
+- Open small PRs
+- Ask questions in Issues
+
+---  
+## 🗺 Roadmap
+See → [`docs/ROADMAP.md`](./docs/ROADMAP.md)
+
+---
+  
+## 📜 License
+This project is licensed under the CC BY-NC 4.0 License.  
+You may use, modify, and share it for non-commercial purposes with attribution.
