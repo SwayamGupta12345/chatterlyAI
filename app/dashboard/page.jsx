@@ -17,6 +17,8 @@ import {
   Lightbulb,
   LayoutDashboard,
   MessageCircleMore,
+  ChevronRight,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +31,7 @@ export default function Dashboard() {
   const [user, setUser] = useState({ name: "" });
   const [userEmail, setUserEmail] = useState("");
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("friends");
   useEffect(() => {
     const fetchSession = async () => {
       const session = await getSession();
@@ -102,8 +105,6 @@ export default function Dashboard() {
         sessionStorage.clear();
         window.location.href = "/login";
         router.push("/login");
-        // Optional: redirect user
-        // window.location.href = "/login";
       }
     } catch (err) {
       console.error("Logout failed", err);
@@ -196,11 +197,6 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* <Link href="/profile">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center cursor-pointer">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-              </Link> */}
               <Link href="/profile">
                 <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 cursor-pointer">
                   {user?.image ? (
@@ -235,61 +231,113 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            {/* Chat with Friends Card */}
             <Link href="/chat" className="block">
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-2xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 mb-1">Chat with friends</p>
-                    {/* <p className="text-3xl font-bold">{subjects.length}</p> */}
+              {" "}
+              <div
+                className="group relative bg-gradient-to-br from-purple-500 via-purple-500 to-purple-600 
+rounded-2xl p-8 text-white cursor-pointer overflow-hidden hover:shadow-xl transition-all 
+duration-300 hover:scale-105 h-full flex flex-col justify-between"
+              >
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-1">
+                        Chat with Friends
+                      </h3>
+                      <p className="text-purple-100 text-sm">
+                        Connect & collaborate
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                      <MessageCircle size={28} className="text-white" />
+                    </div>
                   </div>
-                  <MessageCircle className="w-12 h-12 text-purple-200" />
+                  <div className="flex items-center gap-2 text-purple-100 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                    Start Chat <ChevronRight size={18} />
+                  </div>
                 </div>
               </div>
             </Link>
-
             <Link href="/ask-doubt" className="block">
-              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 mb-1">Chat With AI</p>
-                    {/* <p className="text-3xl font-bold">85%</p> */}
+              {/* Chat with AI Card */}
+              <div
+                className="group relative bg-gradient-to-br from-emerald-500 via-emerald-500 to-emerald-600 
+rounded-2xl p-8 text-white cursor-pointer overflow-hidden hover:shadow-xl transition-all 
+duration-300 hover:scale-105 h-full flex flex-col justify-between"
+              >
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-1">Chat with AI</h3>
+                      <p className="text-emerald-100 text-sm">
+                        Intelligent assistance
+                      </p>
+                    </div>
+                    <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                      <Sparkles size={28} className="text-white" />
+                    </div>
                   </div>
-                  <TrendingUp className="w-12 h-12 text-green-200" />
+                  <div className="flex items-center gap-2 text-emerald-100 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                    Start Chat <ChevronRight size={18} />
+                  </div>
                 </div>
               </div>
             </Link>
           </div>
-          {/* Search Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Search Friends */}
-            <div className="relative max-w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search Friends..."
-                value={searchFriend}
-                onChange={(e) => setSearchFriend(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/60 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-              />
-            </div>
-
-            {/* Search Chat */}
-            <div className="relative max-w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search Chats..."
-                value={searchChat}
-                onChange={(e) => setSearchChat(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/60 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-              />
-            </div>
-            {/* FRIENDS LIST */}
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2 text-gray-700">
+          <div className="flex gap-1 mb-8 bg-slate-100 p-1 rounded-lg w-fit">
+            <button
+              onClick={() => setActiveTab("friends")}
+              className={`px-6 py-2.5 rounded-md font-medium transition-all ${
+                activeTab === "friends"
+                  ? "bg-white text-purple-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Users size={18} />
                 Friends
-              </h2>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab("ai")}
+              className={`px-6 py-2.5 rounded-md font-medium transition-all ${
+                activeTab === "ai"
+                  ? "bg-white text-emerald-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles size={18} />
+                AI Chats
+              </div>
+            </button>
+          </div>
+
+          {/* Search and List */}
+          {activeTab === "friends" ? (
+            <div className="space-y-6">
+              {/* Search */}
+              <div className="relative">
+                <Search
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Search friends..."
+                  value={searchFriend}
+                  onChange={(e) => setSearchFriend(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 bg-white text-slate-900 placeholder-slate-500 transition-all"
+                />
+              </div>
+
+              {/* Friends List */}
               <div className="space-y-3">
                 {filteredFriends.length === 0 && (
                   <p className="text-sm text-gray-400">No friends found</p>
@@ -301,22 +349,50 @@ export default function Dashboard() {
                     onClick={() =>
                       router.push(`/chat?chatboxId=${f.chatbox_id}`)
                     }
-                    className="p-3 bg-white/50 hover:bg-white/70 cursor-pointer rounded-xl border border-white/20 flex justify-between items-center"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200/50 hover:border-purple-300 hover:shadow-md transition-all cursor-pointer group"
                   >
-                    <span className="font-medium">{f.name || f.email}</span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(f.lastModified).toLocaleDateString()}
-                    </span>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Users size={24} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {f.name || f.email}
+                        </p>
+                        <p className="text-sm text-slate-500">Active chat</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">
+                        {new Date(f.lastModified).toLocaleDateString()}
+                      </p>
+                      <ChevronRight
+                        size={20}
+                        className="text-slate-300 group-hover:text-purple-500 transition-colors mt-1"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Search */}
+              <div className="relative">
+                <Search
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  size={20}
+                />
+                <input
+                  type="text"
+                  placeholder="Search AI chats..."
+                  value={searchChat}
+                  onChange={(e) => setSearchChat(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white text-slate-900 placeholder-slate-500 transition-all"
+                />
+              </div>
 
-            {/* AI CHATS LIST */}
-            <div>
-              <h2 className="text-lg font-semibold mb-2 text-gray-700">
-                AI Chats
-              </h2>
+              {/* AI Chats List */}
               <div className="space-y-3">
                 {filteredAIChats.length === 0 && (
                   <p className="text-sm text-gray-400">No chats found</p>
@@ -328,19 +404,33 @@ export default function Dashboard() {
                     onClick={() =>
                       router.push(`/ask-doubt?convoId=${c.convoId}`)
                     }
-                    className="p-3 bg-white/50 hover:bg-white/70 cursor-pointer rounded-xl border border-white/20 flex justify-between items-center"
+                    className="flex items-center justify-between p-4 bg-white rounded-lg border border-slate-200/50 hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group"
                   >
-                    <span className="font-medium">
-                      {c.name || "Untitled Chat"}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(c.lastModified).toLocaleDateString()}
-                    </span>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Sparkles size={24} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {c.name || "Untitled Chat"}
+                        </p>
+                        <p className="text-sm text-slate-500">AI Assistant</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">
+                        {new Date(c.lastModified).toLocaleDateString()}
+                      </p>
+                      <ChevronRight
+                        size={20}
+                        className="text-slate-300 group-hover:text-emerald-500 transition-colors mt-1"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>
