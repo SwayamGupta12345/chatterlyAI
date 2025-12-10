@@ -85,9 +85,9 @@ CLOUDINARY_API_KEY=<your_cloudinary_api_key>
 CLOUDINARY_SECRET=<your_cloudinary_api_secret>
 CLOUDINARY_URL=cloudinary://<your_cloudinary_api_key>:<your_cloudinary_api_secret>@<your_cloudinary_cloud_name>
 
-NEXT_PUBLIC_AGENTIC_BACKEND_URL=<your_agentic_backend_url> #https://github.com/SwayamGupta12345/ChatterlyAI-agentic
-NEXT_PUBLIC_AI_SOCKET_BACKEND_URL=<your_ai_socket_backend_url> # https://github.com/SwayamGupta12345/ChatterlyAI-backend-2
-NEXT_PUBLIC_CHAT_SOCKET_BACKEND_URL=<your_chat_socket_backend_url> #https://github.com/SwayamGupta12345/ChatterlyAI-backend
+NEXT_PUBLIC_AGENTIC_BACKEND_URL=<your_agentic_backend_url> #https://github.com/SwayamGupta12345/ChatterlyAI-Agentic
+NEXT_PUBLIC_CHAT_SOCKET_BACKEND_URL=<your_chat_socket_backend_url> #https://github.com/SwayamGupta12345/ChatterlyAI_Backend_1
+NEXT_PUBLIC_AI_SOCKET_BACKEND_URL=<your_ai_socket_backend_url> # https://github.com/SwayamGupta12345/ChatterlyAI_Backend_2
 ```
 
 Clone the repository and install dependencies:
