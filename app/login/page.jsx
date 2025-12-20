@@ -79,11 +79,18 @@ export default function LoginPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsEmailLoading(true);
     setError("");
+
+    if (!agreed) {
+      setError("You must agree to the Terms of Use and Privacy Policy.");
+      setIsLoading(false);
+      return;
+    }
+    setIsEmailLoading(true);
 
     try {
       // Use NextAuth credentials sign-in (no UI change)
@@ -164,6 +171,15 @@ export default function LoginPage() {
           )}
 
           <div className="my-2 text-center">
+            {/* Demo Warning */}
+            <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-xl mb-4 text-sm text-center">
+              ⚠️ <strong>Educational Demo Only</strong><br />
+              This is a student-built collaborative AI chat project.<br />
+              <strong>Do NOT use real passwords or personal information.</strong>
+            </div>
+            {/* <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-3 py-2 rounded-lg text-sm text-center mb-3">
+              Demo project — do not use real credentials.
+            </div> */}
             <button
               onClick={handleGoogleLogin}
               disabled={isGoogleLoading}
@@ -185,6 +201,10 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Google login is used only for demo authentication.
+            </p>
+
             <p className="text-gray-500 mb-2 mt-4">or sign in with</p>
           </div>
           {/* Login Form */}
@@ -238,6 +258,33 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                required
+                className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span className="ml-2 text-sm text-gray-600">
+                I agree to the{" "}
+                <a
+                  href="/terms"
+                  className="text-purple-600 hover:text-purple-700 transition-colors"
+                >
+                  Terms of Use
+                </a>{" "}
+                and{" "}
+                <a
+                  href="/privacy-policy"
+                  className="text-purple-600 hover:text-purple-700 transition-colors"
+                >
+                  Privacy Policy
+                </a>
+              </span>
             </div>
 
             <button

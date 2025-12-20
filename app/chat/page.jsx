@@ -1,6 +1,6 @@
 //Chat page
 "use client";
-
+import FallbackLayout from "./FallbackLayout";
 import React, { Suspense, useState, useEffect, useRef } from "react";
 import {
   Lightbulb,
@@ -34,7 +34,10 @@ export default function AskDoubtPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-4 text-center text-gray-600">Loading chat...</div>
+        <FallbackLayout
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
       }
     >
       <ChatPageInner />
@@ -228,7 +231,7 @@ function ChatPageInner() {
   useEffect(() => {
     if (!userEmail) return;
     if (!socket.current) {
-      socket.current = io("https://Chatterly-backend-8dwx.onrender.com", {
+      socket.current = io(process.env.NEXT_PUBLIC_CHAT_SOCKET_BACKEND_URL, {
         transports: ["websocket"], // ensure real-time connection
       });
 
@@ -629,6 +632,7 @@ function ChatPageInner() {
 
   const handleFriendSelect = async (friend) => {
     setSelectedFriend(friend);
+    socket.current.emit("join-chat-room", friend.chatbox_id);
     // localStorage.setItem("lastChatboxId", friend.chatbox_id);
     router.replace(`/chat?chatboxId=${friend.chatbox_id}`);
 
@@ -719,37 +723,47 @@ function ChatPageInner() {
 
     setListening((prev) => !prev);
   };
-  const sendMessage = () => {
+
+  const sendMessage = async () => {
     if (!input.trim() || !chatboxId || !userEmail) return;
-    const message = {
-      senderEmail: userEmail,
-      roomId: chatboxId,
-      text: input,
-    };
 
-    socket.current.emit("send-message", message); // send to server
-    // setMessages((prev) => [...prev, message]);
-    setInput("");
-    // ✅ Move this chat to top immediately on send
-    setFriends((prevFriends) => {
-      const updated = prevFriends.map((f) =>
-        f.chatbox_id === chatboxId
-          ? { ...f, lastModified: new Date().toISOString() }
-          : f
-      );
-
-      // 2️⃣ Apply pinned-aware sorting:
-      // - Pinned chats always on top
-      // - Unpinned chats sorted among themselves by lastModified (newest first)
-      const sorted = updated.sort((a, b) => {
-        if (a.pinned && !b.pinned) return -1; // a is pinned → stays on top
-        if (!a.pinned && b.pinned) return 1; // b is pinned → stays below pinned
-        // both pinned or both unpinned → sort by lastModified
-        return new Date(b.lastModified) - new Date(a.lastModified);
-      });
-
-      return sorted;
+    const res = await fetch("/api/send-message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        senderEmail: userEmail,
+        roomId: chatboxId,
+        text: input,
+      }),
     });
+
+    const result = await res.json();
+    if (res.ok && result.success) {
+      const message = {
+        senderEmail: userEmail,
+        roomId: chatboxId,
+        text: input,
+      };
+
+      socket.current.emit("send-message", message);
+      setInput("");
+      setFriends((prevFriends) => {
+        const updated = prevFriends.map((f) =>
+          f.chatbox_id === chatboxId
+            ? { ...f, lastModified: new Date().toISOString() }
+            : f
+        );
+
+        const sorted = updated.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return new Date(b.lastModified) - new Date(a.lastModified);
+        });
+        return sorted;
+      });
+    } else {
+      alert("Failed to send message.");
+    }
   };
 
   const handleEditMessage = (index) => {
@@ -778,7 +792,6 @@ function ChatPageInner() {
       setEditingIndex(null);
       setEditingText("");
 
-      // ✅ Emit socket event to update other user
       socket.current?.emit("edit-message", {
         messageId: updatedMsg._id,
         newText: editingText,
@@ -1130,7 +1143,7 @@ function ChatPageInner() {
                   <Menu className="w-6 h-6" />
                 )}
               </button>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center space-x-3">
+              <h1 className="text-sm md:text-xl lg:text-2xl font-bold text-gray-800 flex items-center space-x-3">
                 <MessageCircleMore className="w-6 h-6" />
                 <span>Chat with Friends</span>
               </h1>
@@ -1178,11 +1191,17 @@ function ChatPageInner() {
                   <div
                     className={`px-4 py-3 rounded-xl shadow-md max-w-[100vw] md:max-w-md ${
                       msg.senderEmail === userEmail
-                        ? "bg-purple-100 text-right rounded-br-none"
-                        : "bg-blue-100 text-left rounded-bl-none self-start"
+                        ? "bg-purple-100 rounded-br-none"
+                        : "bg-blue-100 rounded-bl-none self-start"
                     }`}
                   >
-                    <div className="text-xs font-semibold text-gray-600 mb-1">
+                    <div
+                      className={`text-xs font-semibold text-gray-600 mb-1 ${
+                        msg.senderEmail === userEmail
+                          ? "text-right"
+                          : "text-left"
+                      }`}
+                    >
                       {msg.senderEmail === userEmail
                         ? "You"
                         : selectedFriend?.name ||
@@ -1222,17 +1241,20 @@ function ChatPageInner() {
                           remarkPlugins={[remarkGfm]}
                           components={{
                             p: ({ children }) => {
-                              const isPre = React.Children.toArray(
-                                children
-                              ).some(
-                                (child) =>
-                                  typeof child === "object" &&
-                                  child?.type === "pre"
-                              );
-                              return isPre ? (
-                                <>{children}</>
-                              ) : (
-                                <p>{children}</p>
+                              // total length of complete message, not per-paragraph children
+                              const totalLength = (msg.text || "").length;
+
+                              const isShort =
+                                msg.role === "user" && totalLength <= 64;
+
+                              return (
+                                <p
+                                  className={`mb-1 ${
+                                    isShort ? "text-right" : ""
+                                  }`}
+                                >
+                                  {children}
+                                </p>
                               );
                             },
                             a: ({ href, children }) => (
@@ -1494,10 +1516,11 @@ function ChatPageInner() {
                 </>
                 <button
                   onClick={sendMessage}
-                  className={`bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full transition ${!input.trim()
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:opacity-90"
-                    }`}
+                  className={`bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-full transition ${
+                    !input.trim()
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:opacity-90"
+                  }`}
                 >
                   <Send className="w-4 h-4" />
                 </button>

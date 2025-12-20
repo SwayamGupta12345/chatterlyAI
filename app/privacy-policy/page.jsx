@@ -21,9 +21,9 @@ export default function PrivacyPolicy() {
             Data Collection
           </h2>
           <p className="text-gray-700 text-lg leading-relaxed">
-            <strong>ChatterlyAI</strong> does not collect, store, or share any
-            personal information. All data input by users remains strictly local
-            and is used only for demonstration purposes.
+            <strong>ChatterlyAI</strong> is a student-built demo project.
+            Email or login information is used only for demonstration
+            purposes and should not be real or sensitive data.
           </p>
         </section>
 

@@ -13,7 +13,7 @@
 //     text,
 //     timestamp: new Date(),
 //   };
-  
+
 //   const result = await db.collection("chatboxes").updateOne(
 //     { _id: new ObjectId(chatboxId) },
 //     {
@@ -34,7 +34,7 @@ import { ObjectId } from "mongodb";
 export async function POST(req) {
   const { db } = await connectToDatabase();
 
-  const { senderEmail, chatboxId, text } = await req.json();
+  const { senderEmail, roomId, text } = await req.json();
 
   // 1. Create the message with a unique _id
   const message = {
@@ -50,7 +50,7 @@ export async function POST(req) {
 
     // 3. Push only the _id of the message into chatbox's messages array
     const result = await db.collection("chatboxes").updateOne(
-      { _id: new ObjectId(chatboxId) },
+      { _id: new ObjectId(roomId) },
       {
         $push: { messages: message._id },
         $set: { lastModified: new Date() },
@@ -61,7 +61,11 @@ export async function POST(req) {
       return NextResponse.json({ error: "Chatbox not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ messageId: message._id });
+    return NextResponse.json({
+      success: true,
+      messageId: message._id
+    });
+
   } catch (error) {
     console.error("Error sending message:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

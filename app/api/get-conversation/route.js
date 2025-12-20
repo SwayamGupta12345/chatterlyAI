@@ -32,11 +32,11 @@ export async function GET(req) {
         const aiMsg = await db
           .collection("messages")
           .findOne({ _id: new ObjectId(aiResponseId) });
-
         return {
          user: {
             id: userMsg?._id?.toString() || null,
             text: userMsg?.text || "[Missing User Message]",
+            senderName: userMsg?.senderName || "User",
             isImg: userMsg?.isImg ?? false,
             imageUrl: userMsg?.imageUrl ?? null,
           },

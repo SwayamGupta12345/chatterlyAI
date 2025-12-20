@@ -128,3 +128,26 @@ See → [`docs/ROADMAP.md`](./docs/ROADMAP.md)
 This project is licensed under the CC BY-NC 4.0 License.  
 You may use, modify, and share it for non-commercial purposes with attribution.
 
+### Note: Make sure backend URLs in your environment variables match the ports above. Check CORS settings if requests fail.
+It doesn't matter which ports you run the services on, just make sure URLs in your environment variables are correct and CORS settings allow requests.
+
+---
+
+## 🧩 Contributing
+Contributions are welcome!  
+Start here → [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+
+If you're new:
+- Check `good-first-issues`
+- Open small PRs
+- Ask questions in Issues
+
+---  
+## 🗺 Roadmap
+See → [`docs/ROADMAP.md`](./docs/ROADMAP.md)
+
+---
+  
+## 📜 License
+This project is licensed under the CC BY-NC 4.0 License.  
+You may use, modify, and share it for non-commercial purposes with attribution.

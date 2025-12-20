@@ -143,7 +143,7 @@ export default function SignupPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
               Join ChatterlyAI
             </h1>
-            <p className="text-gray-600">Create your account to get started</p>
+            <p className="text-gray-600">Create your account</p>
           </div>
 
           {/* Error Message */}
@@ -154,6 +154,11 @@ export default function SignupPage() {
           )}
           {/* Google login */}
           <div className="my-2 text-center">
+            {/* Demo Warning */}
+            <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-xl mb-4 text-sm text-center">
+              ⚠️ <strong>Educational Demo Only</strong><br />
+              Do not use real passwords or personal information.
+            </div>
             <button
               onClick={handleGoogleLogin}
               disabled={isGoogleLoading}
@@ -215,13 +220,12 @@ export default function SignupPage() {
                   onChange={handleChange}
                   required
                   className={`w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12
-                   ${
-                     password.length === 0
-                       ? "border border-gray-200 focus:ring-purple-500"
-                       : allGood
-                       ? "border border-green-500 focus:ring-green-500"
-                       : "border border-red-500 focus:ring-red-500"
-                   }`}
+                   ${password.length === 0
+                      ? "border border-gray-200 focus:ring-purple-500"
+                      : allGood
+                        ? "border border-green-500 focus:ring-green-500"
+                        : "border border-red-500 focus:ring-red-500"
+                    }`}
                   placeholder="Create a password"
                 />
                 <button
@@ -254,13 +258,12 @@ export default function SignupPage() {
                   onChange={handleChange}
                   required
                   className={`w-full px-4 py-3 bg-white/50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 pr-12"
-                   ${
-                     confirmPassword.length === 0
-                       ? "border border-gray-200 focus:ring-purple-500"
-                       : passwordChecks.match
-                       ? "border border-green-500 focus:ring-green-500"
-                       : "border border-red-500 focus:ring-red-500"
-                   }`}
+                   ${confirmPassword.length === 0
+                      ? "border border-gray-200 focus:ring-purple-500"
+                      : passwordChecks.match
+                        ? "border border-green-500 focus:ring-green-500"
+                        : "border border-red-500 focus:ring-red-500"
+                    }`}
                   placeholder="Confirm your password"
                 />
                 <button

@@ -85,6 +85,7 @@ export default function AskDoubtClient() {
   // const convoId = searchParams.get("convoId");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const reNameRef = useRef(null);
   const router = useRouter();
   const handleCopy = (text) => navigator.clipboard.writeText(text);
   const sendToWhatsApp = (text) =>
@@ -96,6 +97,18 @@ export default function AskDoubtClient() {
     const gmailUrl = `https://mail.google.com/mail/u/0/?fs=1&to=${to}&su=${subject}&body=${body}&tf=cm`;
     window.open(gmailUrl, "_blank");
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (reNameRef.current && !reNameRef.current.contains(event.target)) {
+        setEditingChatId(null); // cancel editing
+        setNewChatName(""); // optional: reset input value
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [reNameRef]);
   //listening ai message
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -105,7 +118,7 @@ export default function AskDoubtClient() {
 
   useEffect(() => {
     if (!userEmail) return;
-    socket.current = io("https://chatterly-backend-2-es62.onrender.com"); // URL of socket server
+    socket.current = io(process.env.NEXT_PUBLIC_AI_SOCKET_BACKEND_URL); // URL of socket server
 
     socket.current.emit("join-user", userEmail);
 
@@ -390,6 +403,7 @@ export default function AskDoubtClient() {
           {
             id: pair.user?.id || null,
             text: pair.user?.text || "[Missing User Message]",
+            senderName: pair.user?.senderName || "User",
             role: "user",
             isImg: pair.user?.isImg ?? false,
             imageUrl: pair.user?.imageUrl ?? null, // 🔥 fixed
@@ -402,7 +416,6 @@ export default function AskDoubtClient() {
             imageUrl: pair.ai?.imageUrl ?? null, // 🔥 fixed
           },
         ]);
-
         setMessages(
           formatted.length > 0
             ? formatted
@@ -461,7 +474,7 @@ export default function AskDoubtClient() {
       const { insertedId: userMessageId } = await userRes.json();
       // 3️⃣ Call AI API to get response
       const aiRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`,
+        `${process.env.NEXT_PUBLIC_AGENTIC_BACKEND_URL}/chat`,
         {
           user_id: userEmail,
           message: input,
@@ -758,7 +771,7 @@ export default function AskDoubtClient() {
 
       // 🔹 Fetch new AI response
       const aiRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/chat`,
+        `${process.env.NEXT_PUBLIC_AGENTIC_BACKEND_URL}/chat`,
         {
           user_id: userEmail,
           message: text,
@@ -1192,7 +1205,7 @@ export default function AskDoubtClient() {
                     >
                       <AnimatePresence>
                         {editingChatId === chat._id ? (
-                          <div className="px-4 py-[6px]">
+                          <div ref={reNameRef} className="px-4 py-[6px]">
                             <input
                               type="text"
                               value={newChatName}
@@ -1387,7 +1400,8 @@ export default function AskDoubtClient() {
         {/* Main Section */}
         <div className="flex flex-col flex-1 lg:ml-64">
           {/* Header */}
-          <header className="bg-white/70 backdrop-blur-md border-b border-white/20 px-6 py-4 sticky top-0 z-20">
+          <header className="bg-white/70 backdrop-blur-md border-b border-white/20 px-5 py-3 sm:py-3 md:py-4
+ sticky top-0 z-20">
             <div className="flex items-center justify-between">
               {/* Left section: Menu toggle + Heading + Back Link */}
               <div className="flex items-center space-x-4">
@@ -1402,7 +1416,9 @@ export default function AskDoubtClient() {
                   )}
                 </button>
                 <Lightbulb className="w-5 h-5" />
-                <h1 className="text-2xl font-bold text-gray-800">Chatbot</h1>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Chatbot
+                </h1>
               </div>
 
               {/* Right section: Notification + Profile */}
@@ -1616,7 +1632,7 @@ export default function AskDoubtClient() {
                           msg.role === "user" ? "text-right" : "text-left"
                         }`}
                       >
-                        {msg.role === "user" ? "You" : "Bot"}
+                        {msg.role === "user" ? `${msg.senderName}` : "ChatterlyAI"}
                       </div>
 
                       <div className="markdown-content text-sm text-gray-800 overflow-x-hidden">
@@ -1686,30 +1702,47 @@ export default function AskDoubtClient() {
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
                               components={{
+                                // p: ({ children }) => {
+                                //   // Ensure children is an array
+                                //   const childArray = Array.isArray(children)
+                                //     ? children
+                                //     : [children];
+
+                                //   // Compute total text length for alignment
+                                //   const textLength = childArray
+                                //     .map((c) =>
+                                //       typeof c === "string" ? c : ""
+                                //     )
+                                //     .join("").length;
+
+                                //   // Short message → fully right-aligned for user
+                                //   if (msg.role === "user" && textLength <= 64) {
+                                //     return (
+                                //       <p className="mb-1 text-right">
+                                //         {children}
+                                //       </p>
+                                //     );
+                                //   }
+
+                                //   // Long message → normal wrap
+                                //   return <p className="mb-1">{children}</p>;
+                                // },
                                 p: ({ children }) => {
-                                  // Ensure children is an array
-                                  const childArray = Array.isArray(children)
-                                    ? children
-                                    : [children];
+                                  // total length of complete message, not per-paragraph children
+                                  const totalLength = (msg.text || "").length;
 
-                                  // Compute total text length for alignment
-                                  const textLength = childArray
-                                    .map((c) =>
-                                      typeof c === "string" ? c : ""
-                                    )
-                                    .join("").length;
+                                  const isShort =
+                                    msg.role === "user" && totalLength <= 64;
 
-                                  // Short message → fully right-aligned for user
-                                  if (msg.role === "user" && textLength <= 64) {
-                                    return (
-                                      <p className="mb-1 text-right">
-                                        {children}
-                                      </p>
-                                    );
-                                  }
-
-                                  // Long message → normal wrap
-                                  return <p className="mb-1">{children}</p>;
+                                  return (
+                                    <p
+                                      className={`mb-1 ${
+                                        isShort ? "text-right" : ""
+                                      }`}
+                                    >
+                                      {children}
+                                    </p>
+                                  );
                                 },
 
                                 img: ({ src, alt }) => (
@@ -1926,7 +1959,7 @@ export default function AskDoubtClient() {
                                   className="flex items-center gap-1 text-gray-600 hover:text-purple-600 transition"
                                 >
                                   <FaCopy className="w-4 h-4" />
-                                  <span className="text-sm">Copy</span>
+                                  <span className="hidden xs:inline">Copy</span>
                                 </button>
                                 {/* WhatsApp */}
                                 <button
@@ -1935,7 +1968,9 @@ export default function AskDoubtClient() {
                                   className="flex items-center gap-1 text-green-600 hover:text-green-700 transition"
                                 >
                                   <FaWhatsapp className="w-4 h-4" />
-                                  <span className="text-sm">WhatsApp</span>
+                                  <span className="hidden xs:inline">
+                                    WhatsApp
+                                  </span>
                                 </button>
                                 {/* Gmail */}
                                 <button
@@ -1948,7 +1983,9 @@ export default function AskDoubtClient() {
                                     alt="Gmail"
                                     className="w-4 h-4"
                                   />
-                                  <span className="text-sm">Gmail</span>
+                                  <span className="hidden xs:inline">
+                                    Gmail
+                                  </span>
                                 </button>
                                 {/* Speak / Pause */}
                                 <button
@@ -1972,7 +2009,7 @@ export default function AskDoubtClient() {
                                     <FaVolumeUp className="w-4 h-4" />
                                   )}
 
-                                  <span className="text-sm">
+                                  <span>
                                     {isPaused
                                       ? "Resume"
                                       : isSpeaking
@@ -1990,7 +2027,7 @@ export default function AskDoubtClient() {
                 ))}
                 {loading && (
                   <div className="text-sm text-gray-500 animate-pulse">
-                    Bot is typing...
+                    ChatterlyAI is typing...
                   </div>
                 )}
                 {error && <div className="text-sm text-red-500">{error}</div>}
@@ -1998,7 +2035,7 @@ export default function AskDoubtClient() {
               </div>
 
               {/* Chat Input Fixed at Bottom */}
-              <div className="fixed bottom-0 left-0 right-0 lg:ml-64 bg-white/90 backdrop-blur-lg border-t border-white/20 px-6 py-4 z-40">
+              <div className="fixed bottom-0 left-0 right-0 lg:ml-64 bg-white/90 backdrop-blur-lg border-t border-white/20 px-6 py-3 z-40">
                 <div className="flex items-center gap-2 max-w-7xl mx-auto">
                   <textarea
                     ref={inputRef}
@@ -2087,6 +2124,9 @@ export default function AskDoubtClient() {
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
+                <p className="text-xs text-gray-500 justify-center mt-[2px] text-center mb-0">
+                  ChatterlyAI can make mistakes. Check important info.
+                </p>
               </div>
             </div>
             {confirmDelete.show && (
